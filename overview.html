@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Workflow Overview</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+  body { font-family: 'Inter', sans-serif; }
+  .step-arrow::after {
+    content: '';
+    position: absolute;
+    right: -18px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 9px solid transparent;
+    border-left-color: currentColor;
+  }
+</style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex items-center justify-center p-8">
+
+<div class="max-w-4xl w-full space-y-16">
+
+  <!-- Title -->
+  <div class="text-center space-y-3">
+    <h1 class="text-5xl font-black tracking-tight">AI Workflow</h1>
+    <p class="text-zinc-400 text-lg">AI가 만들고, 테스트가 지킨다</p>
+  </div>
+
+  <!-- Core Concept: 한 줄 요약 -->
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center">
+    <p class="text-xl leading-relaxed">
+      <span class="text-amber-400 font-bold">AI에게 코드를 시키고</span>
+      <span class="text-zinc-500 mx-2">&rarr;</span>
+      <span class="text-emerald-400 font-bold">테스트로 검증하고</span>
+      <span class="text-zinc-500 mx-2">&rarr;</span>
+      <span class="text-sky-400 font-bold">리뷰로 보완한다</span>
+    </p>
+    <p class="text-zinc-500 text-sm mt-4">이 3단계를 체계적으로 반복하는 것이 전부</p>
+  </div>
+
+  <!-- Two Flows -->
+  <div class="grid md:grid-cols-2 gap-6">
+
+    <!-- Flow 1: 기존 프로젝트 -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-5">
+      <div>
+        <span class="text-xs font-semibold text-amber-400 bg-amber-400/10 px-2 py-1 rounded">기존 프로젝트</span>
+        <h2 class="text-xl font-bold mt-2">테스트 없는 프로젝트에 안전망 깔기</h2>
+        <p class="text-zinc-500 text-xs mt-1">커맨드 1개: <code class="text-amber-400">/gen-api-tests</code></p>
+      </div>
+
+      <!-- 초기 셋업 (1회) -->
+      <div class="space-y-3 text-sm">
+        <p class="text-zinc-400 text-xs font-semibold uppercase tracking-wider">초기 셋업 (각 1회, 검수 후 다음으로)</p>
+        <ol class="space-y-2">
+          <li class="flex items-start gap-3">
+            <span class="bg-amber-400/10 text-amber-400/70 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">0</span>
+            <span><strong class="text-zinc-400">분석</strong> <span class="text-zinc-500">— 서브에이전트가 프로젝트 전체 파악 &rarr; PROJECT_CONTEXT.md</span></span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="bg-amber-400/10 text-amber-400/70 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">1</span>
+            <span><strong class="text-zinc-400">스캔</strong> <span class="text-zinc-500">— API 엔드포인트 전수 파악 &rarr; endpoints.json</span></span>
+          </li>
+        </ol>
+      </div>
+
+      <!-- 반복 사이클 -->
+      <div class="space-y-3 text-sm">
+        <p class="text-zinc-400 text-xs font-semibold uppercase tracking-wider">엔드포인트 1개씩 반복</p>
+        <ol class="space-y-2">
+          <li class="flex items-start gap-3">
+            <span class="bg-amber-400/20 text-amber-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">2</span>
+            <span><strong class="text-zinc-100">생성</strong> <span class="text-zinc-400">— 통합 테스트 작성 (integration/ 디렉토리)</span></span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="bg-amber-400/20 text-amber-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">3</span>
+            <span><strong class="text-zinc-100">리뷰</strong> <span class="text-zinc-400">— 서브에이전트가 비즈니스 의도 + 엣지케이스 검증</span></span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="bg-amber-400/20 text-amber-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">4</span>
+            <span><strong class="text-zinc-100">실행</strong> <span class="text-zinc-400">— 테스트 돌리고 결과 보여줌</span></span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="bg-zinc-600 text-zinc-300 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">&check;</span>
+            <span><strong class="text-zinc-300">검수</strong> <span class="text-zinc-400">— 사람이 확인 &rarr; 다시 <code class="text-amber-400/80">/gen-api-tests</code></span></span>
+          </li>
+        </ol>
+      </div>
+
+      <div class="text-xs text-zinc-500 border-t border-zinc-800 pt-3">
+        목표: 모든 API &times; 2+ 테스트 케이스 &middot; 매 엔드포인트마다 사람 검수
+      </div>
+    </div>
+
+    <!-- Flow 2: 신규 기능 -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-5">
+      <div>
+        <span class="text-xs font-semibold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded">신규 기능</span>
+        <h2 class="text-xl font-bold mt-2">테스트 먼저, 구현은 AI에게</h2>
+      </div>
+      <ol class="space-y-3 text-sm">
+        <li class="flex items-start gap-3">
+          <span class="bg-emerald-400/20 text-emerald-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">1</span>
+          <span><strong class="text-zinc-100">스펙</strong> <span class="text-zinc-400">— 뭘 만들지 정의</span></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="bg-emerald-400/20 text-emerald-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">2</span>
+          <span><strong class="text-zinc-100">테스트 작성</strong> <span class="text-zinc-400">— 실패하는 테스트부터 작성</span></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="bg-emerald-400/20 text-emerald-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">3</span>
+          <span><strong class="text-zinc-100">구현</strong> <span class="text-zinc-400">— AI가 테스트 통과하도록 구현</span></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="bg-emerald-400/20 text-emerald-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">4</span>
+          <span><strong class="text-zinc-100">리뷰 + 보충</strong> <span class="text-zinc-400">— 서브에이전트 리뷰 &rarr; 테스트 보강</span></span>
+        </li>
+      </ol>
+      <div class="text-xs text-zinc-500 border-t border-zinc-800 pt-3">
+        핵심: 매 단계 사람이 /next로 진행 (AI 자동진행 없음)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 핵심 원칙 -->
+  <div class="text-center space-y-2 text-zinc-500 text-sm">
+    <p class="font-semibold text-zinc-300">핵심 원칙</p>
+    <p>AI가 만든 코드는 <strong class="text-zinc-100">테스트를 통과해야만</strong> 신뢰한다</p>
+    <p>생성한 AI와 <strong class="text-zinc-100">리뷰하는 AI를 분리</strong>한다 (서브에이전트)</p>
+    <p>모든 진행은 <strong class="text-zinc-100">사람이 한 단계씩</strong> 제어한다</p>
+  </div>
+
+</div>
+
+</body>
+</html>
