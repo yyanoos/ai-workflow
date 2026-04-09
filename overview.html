@@ -3,136 +3,621 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Workflow Overview</title>
+<title>AI Workflow — 전체 흐름</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-  body { font-family: 'Inter', sans-serif; }
-  .step-arrow::after {
-    content: '';
-    position: absolute;
-    right: -18px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: 9px solid transparent;
-    border-left-color: currentColor;
-  }
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  body { font-family: 'IBM Plex Sans KR', sans-serif; }
+  code, pre, .mono { font-family: 'IBM Plex Mono', monospace; }
 </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex items-center justify-center p-8">
+<body class="bg-white text-zinc-800 min-h-screen p-6 md:p-12">
 
-<div class="max-w-4xl w-full space-y-16">
+<div class="max-w-5xl mx-auto space-y-10">
 
-  <!-- Title -->
-  <div class="text-center space-y-3">
-    <h1 class="text-5xl font-black tracking-tight">AI Workflow</h1>
-    <p class="text-zinc-400 text-lg">AI가 만들고, 테스트가 지킨다</p>
+  <!-- Header -->
+  <header class="border-b border-zinc-200 pb-6">
+    <h1 class="text-2xl font-bold">AI Workflow</h1>
+    <p class="text-zinc-500 mt-1">AI가 만들고, 테스트가 지킨다. 두 가지 워크플로우로 동작한다.</p>
+    <div class="flex gap-3 mt-3">
+      <a href="#gen-api-tests" class="px-3 py-1.5 bg-zinc-800 text-white text-xs rounded-full font-medium hover:bg-zinc-700"><code>/gen-api-tests</code> — 테스트 커버리지 구축</a>
+      <a href="#dev" class="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-full font-medium hover:bg-indigo-500"><code>/dev</code> — TDD 기반 개발</a>
+    </div>
+  </header>
+
+  <!-- ============================================ -->
+  <!-- /gen-api-tests -->
+  <!-- ============================================ -->
+  <div id="gen-api-tests" class="border-b border-zinc-200 pb-2 mb-6">
+    <h2 class="text-xl font-bold"><code class="bg-zinc-100 px-2 py-1 rounded">/gen-api-tests</code> — 테스트 커버리지 구축</h2>
+    <p class="text-zinc-500 text-sm mt-1">기존 프로젝트에 테스트가 없을 때, 엔드포인트 1개씩 통합 테스트를 만들어간다. <span class="text-amber-600 font-medium">단일 세션 권장.</span></p>
   </div>
 
-  <!-- Core Concept: 한 줄 요약 -->
-  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center">
-    <p class="text-xl leading-relaxed">
-      <span class="text-amber-400 font-bold">AI에게 코드를 시키고</span>
-      <span class="text-zinc-500 mx-2">&rarr;</span>
-      <span class="text-emerald-400 font-bold">테스트로 검증하고</span>
-      <span class="text-zinc-500 mx-2">&rarr;</span>
-      <span class="text-sky-400 font-bold">리뷰로 보완한다</span>
-    </p>
-    <p class="text-zinc-500 text-sm mt-4">이 3단계를 체계적으로 반복하는 것이 전부</p>
-  </div>
+  <!-- 1. 한눈에 보는 흐름 -->
+  <section>
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-zinc-800 text-white rounded flex items-center justify-center text-xs">1</span>
+      한눈에 보는 흐름
+    </h2>
 
-  <!-- Two Flows -->
-  <div class="grid md:grid-cols-2 gap-6">
-
-    <!-- Flow 1: 기존 프로젝트 -->
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-5">
-      <div>
-        <span class="text-xs font-semibold text-amber-400 bg-amber-400/10 px-2 py-1 rounded">기존 프로젝트</span>
-        <h2 class="text-xl font-bold mt-2">테스트 없는 프로젝트에 안전망 깔기</h2>
-        <p class="text-zinc-500 text-xs mt-1">커맨드 1개: <code class="text-amber-400">/gen-api-tests</code></p>
+    <div class="border border-zinc-200 rounded-lg p-6 bg-zinc-50 space-y-4">
+      <!-- Phase 0 -->
+      <div class="flex items-start gap-3">
+        <span class="shrink-0 w-20 text-xs font-bold text-zinc-400 pt-1">Phase 0</span>
+        <div class="flex-1 border border-zinc-200 rounded-lg p-3 bg-white">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-sm font-bold">프로젝트 분석</span>
+            <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium mono">project-analyzer</span>
+            <span class="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium">1회</span>
+          </div>
+          <p class="text-xs text-zinc-500">PROJECT_CONTEXT.md + [AI-CONTEXT] 주석 + 테스트 인프라(docker-compose.test.yml, 프로필, 의존성, DB 스키마)</p>
+        </div>
+        <span class="shrink-0 text-xs text-amber-600 font-medium pt-1">멈춤</span>
       </div>
 
-      <!-- 초기 셋업 (1회) -->
-      <div class="space-y-3 text-sm">
-        <p class="text-zinc-400 text-xs font-semibold uppercase tracking-wider">초기 셋업 (각 1회, 검수 후 다음으로)</p>
-        <ol class="space-y-2">
-          <li class="flex items-start gap-3">
-            <span class="bg-amber-400/10 text-amber-400/70 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">0</span>
-            <span><strong class="text-zinc-400">분석</strong> <span class="text-zinc-500">— 서브에이전트가 프로젝트 전체 파악 &rarr; PROJECT_CONTEXT.md</span></span>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="bg-amber-400/10 text-amber-400/70 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">1</span>
-            <span><strong class="text-zinc-400">스캔</strong> <span class="text-zinc-500">— API 엔드포인트 전수 파악 &rarr; endpoints.json</span></span>
-          </li>
-        </ol>
+      <!-- Phase 1 -->
+      <div class="flex items-start gap-3">
+        <span class="shrink-0 w-20 text-xs font-bold text-zinc-400 pt-1">Phase 1</span>
+        <div class="flex-1 border border-zinc-200 rounded-lg p-3 bg-white">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-sm font-bold">엔드포인트 스캔</span>
+            <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium mono">endpoint-scanner</span>
+            <span class="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium">1회</span>
+          </div>
+          <p class="text-xs text-zinc-500">모든 API 엔드포인트를 찾아 endpoints.json 생성 (git 커밋)</p>
+        </div>
+        <span class="shrink-0 text-xs text-amber-600 font-medium pt-1">멈춤</span>
       </div>
 
-      <!-- 반복 사이클 -->
-      <div class="space-y-3 text-sm">
-        <p class="text-zinc-400 text-xs font-semibold uppercase tracking-wider">엔드포인트 1개씩 반복</p>
-        <ol class="space-y-2">
-          <li class="flex items-start gap-3">
-            <span class="bg-amber-400/20 text-amber-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">2</span>
-            <span><strong class="text-zinc-100">생성</strong> <span class="text-zinc-400">— 통합 테스트 작성 (integration/ 디렉토리)</span></span>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="bg-amber-400/20 text-amber-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">3</span>
-            <span><strong class="text-zinc-100">리뷰</strong> <span class="text-zinc-400">— 서브에이전트가 비즈니스 의도 + 엣지케이스 검증</span></span>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="bg-amber-400/20 text-amber-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">4</span>
-            <span><strong class="text-zinc-100">실행</strong> <span class="text-zinc-400">— 테스트 돌리고 결과 보여줌</span></span>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="bg-zinc-600 text-zinc-300 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">&check;</span>
-            <span><strong class="text-zinc-300">검수</strong> <span class="text-zinc-400">— 사람이 확인 &rarr; 다시 <code class="text-amber-400/80">/gen-api-tests</code></span></span>
-          </li>
-        </ol>
+      <div class="pl-20 pr-12">
+        <div class="border-l-2 border-dashed border-zinc-300 pl-4 py-2">
+          <p class="text-xs text-zinc-400 font-medium">이하 엔드포인트 1개씩 반복</p>
+        </div>
       </div>
 
-      <div class="text-xs text-zinc-500 border-t border-zinc-800 pt-3">
-        목표: 모든 API &times; 2+ 테스트 케이스 &middot; 매 엔드포인트마다 사람 검수
+      <!-- Phase 2 -->
+      <div class="flex items-start gap-3">
+        <span class="shrink-0 w-20 text-xs font-bold text-zinc-400 pt-1">Phase 2</span>
+        <div class="flex-1 border border-blue-200 rounded-lg p-3 bg-blue-50">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-sm font-bold">테스트 생성 + 실행</span>
+            <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium mono">test-writer</span>
+            <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">반복</span>
+          </div>
+          <p class="text-xs text-zinc-500">소스 분석 &rarr; 테스트 작성 &rarr; 실행 &rarr; 실패 시 자동 수정 (최대 3회)</p>
+          <p class="text-xs text-zinc-400 mt-1">첫 엔드포인트: 베이스 클래스 + support/ 헬퍼도 생성</p>
+        </div>
+        <span class="shrink-0 text-xs text-zinc-400 pt-1">&nbsp;</span>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="flex items-start gap-3">
+        <span class="shrink-0 w-20 text-xs font-bold text-zinc-400 pt-1">Phase 3</span>
+        <div class="flex-1 border border-green-200 rounded-lg p-3 bg-green-50">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-sm font-bold">AI 리뷰</span>
+            <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium mono">test-reviewer</span>
+          </div>
+          <p class="text-xs text-zinc-500">테스트 의도 적합성 검증. NEEDS_WORK 시: 반영 &rarr; 재실행 &rarr; 2차 리뷰 (1회 고정)</p>
+          <p class="text-xs text-zinc-400 mt-1">2차에도 NEEDS_WORK: 남은 지적사항을 보고에 포함, 사람이 판단</p>
+        </div>
+        <span class="shrink-0 text-xs text-amber-600 font-medium pt-1">멈춤</span>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="flex items-start gap-3">
+        <span class="shrink-0 w-20 text-xs font-bold text-zinc-400 pt-1">Phase 4</span>
+        <div class="flex-1 border border-zinc-200 rounded-lg p-3 bg-white border-dashed">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-sm font-bold">승인</span>
+            <span class="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded font-medium">사람</span>
+          </div>
+          <p class="text-xs text-zinc-500">검수 후 재실행 &rarr; done 처리 &rarr; 다음 pending 엔드포인트의 Phase 2 자동 시작</p>
+        </div>
+        <span class="shrink-0 text-xs text-zinc-400 pt-1">&nbsp;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 2. 상태 머신 -->
+  <!-- ============================================ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-zinc-800 text-white rounded flex items-center justify-center text-xs">2</span>
+      상태 머신
+    </h2>
+
+    <div class="border border-zinc-200 rounded-lg p-6 bg-zinc-50">
+      <div class="flex flex-wrap items-center justify-center gap-3 text-sm">
+        <span class="px-3 py-1.5 rounded-full bg-zinc-200 text-zinc-700 font-medium">pending</span>
+        <span class="text-zinc-400">&rarr; Phase 2+3 &rarr;</span>
+        <span class="px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 font-medium">review</span>
+        <span class="text-zinc-400">&rarr; 사람 승인 &rarr;</span>
+        <span class="px-3 py-1.5 rounded-full bg-green-100 text-green-800 font-medium">done</span>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-3 text-sm mt-3">
+        <span class="text-zinc-400">Phase 2 실패 &rarr;</span>
+        <span class="px-3 py-1.5 rounded-full bg-red-100 text-red-800 font-medium">failed</span>
+        <span class="text-zinc-400">&rarr;</span>
+        <code class="text-xs bg-zinc-100 px-1.5 py-0.5 rounded">--retry-failed</code>
+        <span class="text-zinc-400">&rarr;</span>
+        <span class="px-3 py-1.5 rounded-full bg-zinc-200 text-zinc-700 font-medium">pending</span>
+      </div>
+
+      <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <div class="border border-zinc-200 rounded p-2 bg-white">
+          <span class="font-bold text-zinc-600">pending</span>
+          <p class="text-zinc-400 mt-0.5">테스트 미생성</p>
+        </div>
+        <div class="border border-amber-200 rounded p-2 bg-white">
+          <span class="font-bold text-amber-700">review</span>
+          <p class="text-zinc-400 mt-0.5">통과 + AI 리뷰 완료, 사람 검수 대기</p>
+        </div>
+        <div class="border border-green-200 rounded p-2 bg-white">
+          <span class="font-bold text-green-700">done</span>
+          <p class="text-zinc-400 mt-0.5">사람 승인 완료</p>
+        </div>
+        <div class="border border-red-200 rounded p-2 bg-white">
+          <span class="font-bold text-red-700">failed</span>
+          <p class="text-zinc-400 mt-0.5">3회 실패, 수동 개입 필요</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 3. 에이전트 구성 -->
+  <!-- ============================================ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-zinc-800 text-white rounded flex items-center justify-center text-xs">3</span>
+      에이전트 구성
+    </h2>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="border border-zinc-200 rounded-lg p-4">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-sm font-bold mono">project-analyzer</span>
+          <span class="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded">Phase 0</span>
+        </div>
+        <p class="text-xs text-zinc-500">시니어 아키텍트. 프로젝트 전체를 분석하여 AI가 이해할 수 있는 컨텍스트를 만든다.</p>
+        <div class="mt-2 text-xs text-zinc-400">
+          <p>산출물: PROJECT_CONTEXT.md, [AI-CONTEXT] 주석, 테스트 인프라</p>
+          <p>Tools: Read, Write, Edit, Grep, Glob, Bash</p>
+        </div>
+      </div>
+
+      <div class="border border-zinc-200 rounded-lg p-4">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-sm font-bold mono">endpoint-scanner</span>
+          <span class="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded">Phase 1</span>
+        </div>
+        <p class="text-xs text-zinc-500">시니어 백엔드 엔지니어. 모든 API 엔드포인트를 찾아 JSON으로 정리한다.</p>
+        <div class="mt-2 text-xs text-zinc-400">
+          <p>산출물: endpoints.json</p>
+          <p>Tools: Read, Grep, Glob, Bash</p>
+        </div>
+      </div>
+
+      <div class="border border-blue-200 rounded-lg p-4 bg-blue-50/30">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-sm font-bold mono">test-writer</span>
+          <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Phase 2</span>
+        </div>
+        <p class="text-xs text-zinc-500">시니어 테스트 엔지니어. 테스트 작성 + 실행 + 실패 수정까지 책임진다.</p>
+        <div class="mt-2 text-xs text-zinc-400">
+          <p>산출물: 통합 테스트 파일, support 헬퍼</p>
+          <p>Tools: Read, Write, Edit, Grep, Glob, Bash</p>
+        </div>
+      </div>
+
+      <div class="border border-green-200 rounded-lg p-4 bg-green-50/30">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-sm font-bold mono">test-reviewer</span>
+          <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">Phase 3</span>
+        </div>
+        <p class="text-xs text-zinc-500">시니어 QA 엔지니어. 통과한 테스트의 의도 적합성을 검증한다. 읽기 전용.</p>
+        <div class="mt-2 text-xs text-zinc-400">
+          <p>산출물: PASS / NEEDS_WORK 판정</p>
+          <p>Tools: Read, Grep, Glob</p>
+        </div>
       </div>
     </div>
 
-    <!-- Flow 2: 신규 기능 -->
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-5">
-      <div>
-        <span class="text-xs font-semibold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded">신규 기능</span>
-        <h2 class="text-xl font-bold mt-2">테스트 먼저, 구현은 AI에게</h2>
+    <div class="mt-4 border border-zinc-200 rounded-lg p-4 bg-zinc-50 text-xs text-zinc-500">
+      <p class="font-medium text-zinc-700 mb-1">메인 세션 (오케스트레이터)</p>
+      <p>Phase 흐름 제어, 대상 선택, NEEDS_WORK 반영, endpoints.json 상태 관리. 서브에이전트가 무거운 작업을 하고, 메인은 조율만 한다.</p>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 4. 프로젝트에 생기는 파일 -->
+  <!-- ============================================ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-zinc-800 text-white rounded flex items-center justify-center text-xs">4</span>
+      프로젝트에 생기는 파일
+    </h2>
+
+    <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-4">
+      <pre class="text-sm text-zinc-700 leading-relaxed mono">your-project/
+├── PROJECT_CONTEXT.md                 <span class="text-zinc-400">← Phase 0. 아키텍처/도메인 문서 (200줄)</span>
+├── docker-compose.test.yml            <span class="text-zinc-400">← Phase 0. 테스트 전용 인프라 (볼륨 없음)</span>
+├── .test-coverage/
+│   └── endpoints.json                 <span class="text-zinc-400">← Phase 1. 진행 상태 추적 (git 커밋)</span>
+├── src/main/.../Controller.java       <span class="text-zinc-400">← [AI-CONTEXT] 주석 추가됨</span>
+├── src/test/resources/
+│   └── application-integration.yml    <span class="text-zinc-400">← Phase 0. 테스트 프로필 설정</span>
+└── src/test/.../integration/          <span class="text-zinc-400">← AI 전용 테스트 트랙</span>
+    ├── support/                       <span class="text-zinc-400">← 베이스 클래스 + 공통 헬퍼</span>
+    ├── AuthControllerIT.java
+    └── MemberControllerIT.java</pre>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 5. 설치 & 사용 -->
+  <!-- ============================================ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-zinc-800 text-white rounded flex items-center justify-center text-xs">5</span>
+      설치 &amp; 사용
+    </h2>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="border border-zinc-200 rounded-lg p-4">
+        <p class="font-semibold text-sm mb-2">설치 (1회)</p>
+        <pre class="bg-zinc-800 text-zinc-100 rounded p-3 text-xs leading-relaxed mono">git clone https://github.com/yyanoos/ai-workflow.git
+cd ai-workflow
+bash install.sh      <span class="text-zinc-500"># Mac/Linux</span>
+./install.ps1        <span class="text-zinc-500"># Windows</span></pre>
+        <p class="text-xs text-zinc-400 mt-2">소스 수정 후 install 재실행하면 반영됩니다.</p>
       </div>
-      <ol class="space-y-3 text-sm">
-        <li class="flex items-start gap-3">
-          <span class="bg-emerald-400/20 text-emerald-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">1</span>
-          <span><strong class="text-zinc-100">스펙</strong> <span class="text-zinc-400">— 뭘 만들지 정의</span></span>
-        </li>
-        <li class="flex items-start gap-3">
-          <span class="bg-emerald-400/20 text-emerald-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">2</span>
-          <span><strong class="text-zinc-100">테스트 작성</strong> <span class="text-zinc-400">— 실패하는 테스트부터 작성</span></span>
-        </li>
-        <li class="flex items-start gap-3">
-          <span class="bg-emerald-400/20 text-emerald-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">3</span>
-          <span><strong class="text-zinc-100">구현</strong> <span class="text-zinc-400">— AI가 테스트 통과하도록 구현</span></span>
-        </li>
-        <li class="flex items-start gap-3">
-          <span class="bg-emerald-400/20 text-emerald-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs">4</span>
-          <span><strong class="text-zinc-100">리뷰 + 보충</strong> <span class="text-zinc-400">— 서브에이전트 리뷰 &rarr; 테스트 보강</span></span>
-        </li>
-      </ol>
-      <div class="text-xs text-zinc-500 border-t border-zinc-800 pt-3">
-        핵심: 매 단계 사람이 /next로 진행 (AI 자동진행 없음)
+      <div class="border border-zinc-200 rounded-lg p-4">
+        <p class="font-semibold text-sm mb-2">사용</p>
+        <pre class="bg-zinc-800 text-zinc-100 rounded p-3 text-xs leading-relaxed mono">cd your-project
+/gen-api-tests
+
+<span class="text-zinc-500"># 1회차 → Phase 0 (분석) → 멈춤</span>
+<span class="text-zinc-500"># 2회차 → Phase 1 (스캔) → 멈춤</span>
+<span class="text-zinc-500"># 3회차 → 엔드포인트 1개 생성+실행+리뷰 → 멈춤</span>
+<span class="text-zinc-500"># 4회차 → 승인 + 다음 엔드포인트 → 멈춤</span>
+<span class="text-zinc-500"># ...</span></pre>
       </div>
     </div>
 
+    <div class="mt-4 border border-zinc-200 rounded-lg p-4">
+      <p class="font-semibold text-sm mb-2">플래그</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+        <div class="flex gap-2">
+          <code class="shrink-0 bg-zinc-100 px-1.5 py-0.5 rounded">POST /api/auth/login</code>
+          <span class="text-zinc-500">특정 엔드포인트 지정</span>
+        </div>
+        <div class="flex gap-2">
+          <code class="shrink-0 bg-zinc-100 px-1.5 py-0.5 rounded">--reanalyze</code>
+          <span class="text-zinc-500">Phase 0 강제 재실행</span>
+        </div>
+        <div class="flex gap-2">
+          <code class="shrink-0 bg-zinc-100 px-1.5 py-0.5 rounded">--rescan</code>
+          <span class="text-zinc-500">Phase 1 강제 재실행</span>
+        </div>
+        <div class="flex gap-2">
+          <code class="shrink-0 bg-zinc-100 px-1.5 py-0.5 rounded">--retry-failed</code>
+          <span class="text-zinc-500">실패 엔드포인트를 pending으로 리셋</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 6. 설계 원칙 -->
+  <!-- ============================================ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-zinc-800 text-white rounded flex items-center justify-center text-xs">6</span>
+      설계 원칙 (gen-api-tests)
+    </h2>
+
+    <div class="grid md:grid-cols-3 gap-4 text-xs">
+      <div class="border border-zinc-200 rounded-lg p-4">
+        <p class="font-bold text-sm mb-1">사람의 시간이 가장 비싸다</p>
+        <p class="text-zinc-500">사람은 "통과하고 리뷰도 끝난 테스트"만 검수한다. 컴파일 에러, 실행 실패는 AI가 먼저 해결한다.</p>
+      </div>
+      <div class="border border-zinc-200 rounded-lg p-4">
+        <p class="font-bold text-sm mb-1">메인 세션은 오케스트레이터</p>
+        <p class="text-zinc-500">무거운 작업은 서브에이전트가 처리. 메인 세션의 컨텍스트를 보호하고, 각 에이전트는 독립적으로 실행된다.</p>
+      </div>
+      <div class="border border-zinc-200 rounded-lg p-4">
+        <p class="font-bold text-sm mb-1">1개씩, 멈추고, 검수</p>
+        <p class="text-zinc-500">한 번에 모든 테스트를 만들지 않는다. 엔드포인트 1개씩 처리하고 사람이 확인한 뒤 다음으로 넘어간다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- /dev -->
+  <!-- ============================================ -->
+  <div id="dev" class="border-b border-zinc-200 pb-2 mb-6 mt-16">
+    <h2 class="text-xl font-bold"><code class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded">/dev</code> — TDD 기반 개발</h2>
+    <p class="text-zinc-500 text-sm mt-1">테스트 환경 구축 후, 기능 개발/수정/버그 수정을 TDD 방식으로 수행한다. <span class="text-green-600 font-medium">복수 세션 동시 가능.</span></p>
   </div>
 
-  <!-- 핵심 원칙 -->
-  <div class="text-center space-y-2 text-zinc-500 text-sm">
-    <p class="font-semibold text-zinc-300">핵심 원칙</p>
-    <p>AI가 만든 코드는 <strong class="text-zinc-100">테스트를 통과해야만</strong> 신뢰한다</p>
-    <p>생성한 AI와 <strong class="text-zinc-100">리뷰하는 AI를 분리</strong>한다 (서브에이전트)</p>
-    <p>모든 진행은 <strong class="text-zinc-100">사람이 한 단계씩</strong> 제어한다</p>
-  </div>
+  <!-- /dev 흐름 -->
+  <section>
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-indigo-600 text-white rounded flex items-center justify-center text-xs">1</span>
+      한눈에 보는 흐름
+    </h2>
+
+    <div class="border border-indigo-200 rounded-lg p-6 bg-indigo-50/30 space-y-4">
+      <!-- Phase 1 -->
+      <div class="flex items-start gap-3">
+        <span class="shrink-0 w-20 text-xs font-bold text-zinc-400 pt-1">Phase 1</span>
+        <div class="flex-1 border border-zinc-200 rounded-lg p-3 bg-white">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-sm font-bold">구현 명세</span>
+            <span class="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded font-medium">메인 세션</span>
+            <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-medium">대화형</span>
+          </div>
+          <p class="text-xs text-zinc-500">개발자와 대화 &rarr; 변경 유형, 영향 범위, 스키마 변경, 수용 기준 합의</p>
+          <p class="text-xs text-zinc-400 mt-1">산출물: .dev/{slug}/spec.md + feature/{slug} 브랜치</p>
+        </div>
+        <span class="shrink-0 text-xs text-amber-600 font-medium pt-1">멈춤</span>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="flex items-start gap-3">
+        <span class="shrink-0 w-20 text-xs font-bold text-zinc-400 pt-1">Phase 2</span>
+        <div class="flex-1 border border-red-200 rounded-lg p-3 bg-red-50">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-sm font-bold">테스트 작성</span>
+            <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium mono">spec-test-writer</span>
+            <span class="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-medium">RED</span>
+          </div>
+          <p class="text-xs text-zinc-500">명세 기반 통합 테스트 작성 &rarr; 컴파일 성공 + 테스트 실패 (구현 부재)</p>
+          <p class="text-xs text-zinc-400 mt-1">스키마 변경 시 마이그레이션 먼저 생성. 단위 테스트 X.</p>
+        </div>
+        <span class="shrink-0 text-xs text-amber-600 font-medium pt-1">멈춤</span>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="flex items-start gap-3">
+        <span class="shrink-0 w-20 text-xs font-bold text-zinc-400 pt-1">Phase 3</span>
+        <div class="flex-1 border border-green-200 rounded-lg p-3 bg-green-50">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-sm font-bold">구현</span>
+            <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium mono">implementer</span>
+            <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">GREEN</span>
+          </div>
+          <p class="text-xs text-zinc-500">테스트를 통과시키는 코드 작성 &rarr; 전체 테스트 통과 (새 것 + 기존 것)</p>
+          <p class="text-xs text-zinc-400 mt-1">제약: 테스트 수정 금지, 기존 코드 리팩토링 금지, 막히면 중단 보고</p>
+        </div>
+        <span class="shrink-0 text-xs text-zinc-400 pt-1">&nbsp;</span>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="flex items-start gap-3">
+        <span class="shrink-0 w-20 text-xs font-bold text-zinc-400 pt-1">Phase 4</span>
+        <div class="flex-1 border border-orange-200 rounded-lg p-3 bg-orange-50">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-sm font-bold">코드 리뷰</span>
+            <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium mono">code-reviewer</span>
+          </div>
+          <p class="text-xs text-zinc-500">보안, 에러 처리, 성능, DB 안전성, 설계, 유지보수성 검토</p>
+          <p class="text-xs text-zinc-400 mt-1">NEEDS_WORK: minor &rarr; 메인 반영, major &rarr; implementer 재호출 (리뷰 지적사항이 지시문)</p>
+        </div>
+        <span class="shrink-0 text-xs text-amber-600 font-medium pt-1">멈춤</span>
+      </div>
+
+      <!-- Phase 5 -->
+      <div class="flex items-start gap-3">
+        <span class="shrink-0 w-20 text-xs font-bold text-zinc-400 pt-1">Phase 5</span>
+        <div class="flex-1 border border-zinc-200 rounded-lg p-3 bg-white">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-sm font-bold">MR + 알림</span>
+            <span class="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded font-medium">메인 세션</span>
+          </div>
+          <p class="text-xs text-zinc-500">commit &rarr; push &rarr; MR 생성 (spec.md 기반 설명) &rarr; Slack 알림 (설정 시)</p>
+        </div>
+        <span class="shrink-0 text-xs text-zinc-400 pt-1">&nbsp;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- /dev 상태 머신 -->
+  <section>
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-indigo-600 text-white rounded flex items-center justify-center text-xs">2</span>
+      상태 머신
+    </h2>
+
+    <div class="border border-indigo-200 rounded-lg p-6 bg-indigo-50/30">
+      <div class="flex flex-wrap items-center justify-center gap-3 text-sm">
+        <span class="px-3 py-1.5 rounded-full bg-zinc-200 text-zinc-700 font-medium">spec</span>
+        <span class="text-zinc-400">&rarr;</span>
+        <span class="px-3 py-1.5 rounded-full bg-red-100 text-red-800 font-medium">red</span>
+        <span class="text-zinc-400">&rarr;</span>
+        <span class="px-3 py-1.5 rounded-full bg-green-100 text-green-800 font-medium">green</span>
+        <span class="text-zinc-400">&rarr;</span>
+        <span class="px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 font-medium">reviewed</span>
+        <span class="text-zinc-400">&rarr;</span>
+        <span class="px-3 py-1.5 rounded-full bg-indigo-100 text-indigo-800 font-medium">merged</span>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-3 text-sm mt-3">
+        <span class="text-zinc-400">구현 불가 &rarr;</span>
+        <span class="px-3 py-1.5 rounded-full bg-orange-100 text-orange-800 font-medium">blocked</span>
+        <span class="text-zinc-400">&rarr; 사람 판단 &rarr; spec 또는 green</span>
+      </div>
+
+      <div class="mt-6 grid grid-cols-3 md:grid-cols-6 gap-2 text-xs">
+        <div class="border border-zinc-200 rounded p-2 bg-white">
+          <span class="font-bold text-zinc-600">spec</span>
+          <p class="text-zinc-400 mt-0.5">명세 완료</p>
+        </div>
+        <div class="border border-red-200 rounded p-2 bg-white">
+          <span class="font-bold text-red-700">red</span>
+          <p class="text-zinc-400 mt-0.5">테스트 실패 중</p>
+        </div>
+        <div class="border border-green-200 rounded p-2 bg-white">
+          <span class="font-bold text-green-700">green</span>
+          <p class="text-zinc-400 mt-0.5">전체 통과</p>
+        </div>
+        <div class="border border-amber-200 rounded p-2 bg-white">
+          <span class="font-bold text-amber-700">reviewed</span>
+          <p class="text-zinc-400 mt-0.5">리뷰 완료</p>
+        </div>
+        <div class="border border-orange-200 rounded p-2 bg-white">
+          <span class="font-bold text-orange-700">blocked</span>
+          <p class="text-zinc-400 mt-0.5">구현 불가</p>
+        </div>
+        <div class="border border-indigo-200 rounded p-2 bg-white">
+          <span class="font-bold text-indigo-700">merged</span>
+          <p class="text-zinc-400 mt-0.5">MR 완료</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- /dev 에이전트 구성 -->
+  <section>
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-indigo-600 text-white rounded flex items-center justify-center text-xs">3</span>
+      에이전트 구성
+    </h2>
+
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="border border-red-200 rounded-lg p-4 bg-red-50/30">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-sm font-bold mono">spec-test-writer</span>
+          <span class="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded">Phase 2</span>
+        </div>
+        <p class="text-xs text-zinc-500">명세 기반 통합 테스트 작성. 스키마 변경 시 마이그레이션도 생성. RED 확인까지.</p>
+        <div class="mt-2 text-xs text-zinc-400">
+          <p>Tools: Read, Write, Edit, Grep, Glob, Bash</p>
+        </div>
+      </div>
+
+      <div class="border border-green-200 rounded-lg p-4 bg-green-50/30">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-sm font-bold mono">implementer</span>
+          <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">Phase 3</span>
+        </div>
+        <p class="text-xs text-zinc-500">테스트를 통과시키는 코드 작성. 테스트 수정 금지. 막히면 중단 보고.</p>
+        <div class="mt-2 text-xs text-zinc-400">
+          <p>Tools: Read, Write, Edit, Grep, Glob, Bash</p>
+        </div>
+      </div>
+
+      <div class="border border-orange-200 rounded-lg p-4 bg-orange-50/30">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-sm font-bold mono">code-reviewer</span>
+          <span class="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded">Phase 4</span>
+        </div>
+        <p class="text-xs text-zinc-500">빅테크 시니어 관점 리뷰. 보안/성능/설계 검토. 읽기 전용.</p>
+        <div class="mt-2 text-xs text-zinc-400">
+          <p>Tools: Read, Grep, Glob</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 border border-indigo-200 rounded-lg p-4 bg-indigo-50/30 text-xs text-zinc-500">
+      <p class="font-medium text-zinc-700 mb-1">메인 세션 (오케스트레이터)</p>
+      <p>Phase 1 대화형 명세 작성, Phase 흐름 제어, NEEDS_WORK minor 반영, MR 생성. 서브에이전트가 무거운 작업을 하고, 메인은 조율만 한다.</p>
+    </div>
+  </section>
+
+  <!-- /dev 프로젝트에 생기는 파일 -->
+  <section>
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-indigo-600 text-white rounded flex items-center justify-center text-xs">4</span>
+      프로젝트에 생기는 파일
+    </h2>
+
+    <div class="bg-indigo-50/30 border border-indigo-200 rounded-lg p-4">
+      <pre class="text-sm text-zinc-700 leading-relaxed mono">your-project/
+├── .dev/
+│   ├── board-crud/                    <span class="text-zinc-400">← 기능별 독립 디렉토리 (동시 개발 가능)</span>
+│   │   ├── spec.md                    <span class="text-zinc-400">← Phase 1. 구현 명세</span>
+│   │   └── status.json                <span class="text-zinc-400">← 진행 상태 + feature 브랜치명</span>
+│   └── notification/                  <span class="text-zinc-400">← 다른 세션에서 동시 작업 가능</span>
+│       ├── spec.md
+│       └── status.json
+├── src/main/.../BoardController.java  <span class="text-zinc-400">← Phase 3. 새 프로덕션 코드</span>
+├── db/migration/V3__add_board.sql     <span class="text-zinc-400">← Phase 2. 마이그레이션 (필요 시)</span>
+└── src/test/.../integration/
+    └── BoardControllerIT.java         <span class="text-zinc-400">← Phase 2. 명세 기반 테스트</span></pre>
+    </div>
+  </section>
+
+  <!-- /dev 사용법 -->
+  <section>
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-indigo-600 text-white rounded flex items-center justify-center text-xs">5</span>
+      사용법
+    </h2>
+
+    <div class="border border-indigo-200 rounded-lg p-4 bg-indigo-50/30">
+      <pre class="bg-zinc-800 text-zinc-100 rounded p-3 text-xs leading-relaxed mono"><span class="text-zinc-500"># 세션 A</span>
+/dev "게시판 CRUD API 추가"
+<span class="text-zinc-500"># → .dev/board-crud/ + feature/board-crud 브랜치</span>
+
+<span class="text-zinc-500"># 세션 B (동시 가능)</span>
+/dev "알림 기능 추가"
+<span class="text-zinc-500"># → .dev/notification/ + feature/notification 브랜치</span>
+
+<span class="text-zinc-500"># 이어서 하기 (기능명으로 자동 매칭)</span>
+/dev "게시판 CRUD API 추가"
+<span class="text-zinc-500"># → .dev/board-crud/status.json의 상태에 따라 진입</span></pre>
+    </div>
+
+    <div class="mt-4 border border-indigo-200 rounded-lg p-4">
+      <p class="font-semibold text-sm mb-2">플래그</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+        <div class="flex gap-2">
+          <code class="shrink-0 bg-zinc-100 px-1.5 py-0.5 rounded">--respec</code>
+          <span class="text-zinc-500">Phase 1 강제 재실행</span>
+        </div>
+        <div class="flex gap-2">
+          <code class="shrink-0 bg-zinc-100 px-1.5 py-0.5 rounded">--retest</code>
+          <span class="text-zinc-500">Phase 2 강제 재실행</span>
+        </div>
+        <div class="flex gap-2">
+          <code class="shrink-0 bg-zinc-100 px-1.5 py-0.5 rounded">--from 3</code>
+          <span class="text-zinc-500">특정 Phase부터 시작</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 전체 설계 원칙 (공통) -->
+  <!-- ============================================ -->
+  <section class="mt-16">
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span class="w-6 h-6 bg-zinc-800 text-white rounded flex items-center justify-center text-xs">&bull;</span>
+      설계 원칙 (공통)
+    </h2>
+
+    <div class="grid md:grid-cols-3 gap-4 text-xs">
+      <div class="border border-zinc-200 rounded-lg p-4">
+        <p class="font-bold text-sm mb-1">사람의 시간이 가장 비싸다</p>
+        <p class="text-zinc-500">사람은 의도와 정확성만 검수한다. 컴파일, 실행, 인프라 검증은 AI가 먼저 해결한다.</p>
+      </div>
+      <div class="border border-zinc-200 rounded-lg p-4">
+        <p class="font-bold text-sm mb-1">메인 세션은 오케스트레이터</p>
+        <p class="text-zinc-500">무거운 작업은 서브에이전트가 처리. 메인 세션의 컨텍스트를 보호하고, 각 에이전트는 독립적으로 실행된다.</p>
+      </div>
+      <div class="border border-zinc-200 rounded-lg p-4">
+        <p class="font-bold text-sm mb-1">테스트가 진실의 원천</p>
+        <p class="text-zinc-500">테스트를 먼저 쓰고, 테스트를 통과시키는 구현을 하고, 테스트가 깨지지 않는 리뷰를 한다.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="text-xs text-zinc-300 pt-4 border-t border-zinc-100">
+    ai-workflow &middot; github.com/yyanoos/ai-workflow
+  </footer>
 
 </div>
 

@@ -1,16 +1,27 @@
 # AI Workflow - 설치 스크립트 (Windows)
-# ~/.claude/commands/ 에 커맨드 파일을 복사합니다.
+# ~/.claude/ 에 커맨드와 에이전트를 복사합니다.
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$targetDir = Join-Path $env:USERPROFILE ".claude\commands"
+$claudeDir = Join-Path $env:USERPROFILE ".claude"
 
-if (-not (Test-Path $targetDir)) {
-    New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+# Commands 설치
+$cmdDir = Join-Path $claudeDir "commands"
+if (-not (Test-Path $cmdDir)) {
+    New-Item -ItemType Directory -Path $cmdDir -Force | Out-Null
+}
+Get-ChildItem "$scriptDir\commands\*.md" | ForEach-Object {
+    Copy-Item $_.FullName -Destination $cmdDir -Force
+    Write-Host "커맨드 설치됨: $cmdDir\$($_.Name)"
 }
 
-Get-ChildItem "$scriptDir\commands\*.md" | ForEach-Object {
-    Copy-Item $_.FullName -Destination $targetDir -Force
-    Write-Host "설치됨: $targetDir\$($_.Name)"
+# Agents 설치
+$agentDir = Join-Path $claudeDir "agents"
+if (-not (Test-Path $agentDir)) {
+    New-Item -ItemType Directory -Path $agentDir -Force | Out-Null
+}
+Get-ChildItem "$scriptDir\agents\*.md" | ForEach-Object {
+    Copy-Item $_.FullName -Destination $agentDir -Force
+    Write-Host "에이전트 설치됨: $agentDir\$($_.Name)"
 }
 
 Write-Host ""
