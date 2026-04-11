@@ -50,6 +50,16 @@ tools: Read
 | 신규 프로젝트 | `💡 tip: /strategy부터 시작하면 시장 검증 후 개발해서 삽질 방지` |
 | 기존 프로젝트 복귀 | `💡 tip: /who 로 현재 단계에 맞는 전문가 확인` |
 
+### 에러 복구
+
+| 상황 | tip |
+|------|-----|
+| BLOCKED (구현 불가) | `💡 tip: spec 수정이 필요하면 /dev --respec, 직접 해결 후 재시작은 /dev --from 3` |
+| FAIL (테스트 3회 실패) | `💡 tip: /qa --retry-failed 로 실패 엔드포인트를 재시도. 원인 파악은 /investigate` |
+| ERROR (인프라 문제) | `💡 tip: docker compose -f docker-compose.test.yml down && up -d --wait 로 인프라 초기화` |
+| CONFLICT (파일 충돌) | `💡 tip: 충돌 세션이 merged 될 때까지 대기하거나, /dev --list 로 현황 파악` |
+| 리뷰 NEEDS_WORK 반복 | `💡 tip: 2차 리뷰까지 NEEDS_WORK면 사람이 판단. 남은 지적사항 확인 후 진행 여부 결정` |
+
 ### 범용
 
 | 상황 | tip |
@@ -59,6 +69,7 @@ tools: Read
 | 복잡한 변경 전 | `💡 tip: 플랜모드(shift+tab)로 설계 먼저 잡으면 실수 줄어듦` |
 | 디버깅 중 | `💡 tip: /investigate 로 체계적 디버깅 (가설→검증→수정)` |
 | 보안 걱정 | `💡 tip: /security 로 보안감사 가능 (준비 중)` |
+| 세션 종료 전 | `💡 tip: /session-docs 로 작업 요약 생성하면 다음 세션 인수인계가 쉬워요` |
 
 ---
 
