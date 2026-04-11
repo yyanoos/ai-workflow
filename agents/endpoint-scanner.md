@@ -28,7 +28,7 @@ tools: Read, Grep, Glob, Bash
    - Express/Fastify: `router.get()`, `app.post()` 등
    - FastAPI: `@app.get()`, `@router.post()` 등
 
-3. **endpoints.json 생성**: `.test-coverage/endpoints.json`에 저장
+3. **endpoints.json 생성**: `.ai-company/qa/endpoints.json`에 저장
 
 ### endpoints.json 스키마
 
@@ -68,7 +68,7 @@ tools: Read, Grep, Glob, Bash
 
 ## 산출물
 
-- `.test-coverage/endpoints.json` 파일 생성/갱신
+- `.ai-company/qa/endpoints.json` 파일 생성/갱신
 - 스캔 결과 요약 출력 (총 엔드포인트 수, 컨트롤러별 수)
 
 ## 주의사항

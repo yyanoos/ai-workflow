@@ -53,8 +53,8 @@ Phase 0, 1은 산출물 유무로 판단. Phase 2 이후는 endpoints.json의 st
 (에이전트 정의: `agents/project-analyzer.md`)
 
 에이전트가 프로젝트 전체를 분석하여:
-- `PROJECT_CONTEXT.md` 생성 (아키텍처, 도메인, 비자명한 제약사항. 최대 200줄)
-- 각 컨트롤러의 비자명한 엔드포인트 메서드에 `[AI-CONTEXT]` 주석 추가 (비즈니스 의도, 주의사항, 의존관계)
+- `PROJECT_CONTEXT.md` 생성 (에이전트용 프로젝트 인덱스 + 도메인 지식. 줄 수 제한 없음)
+- 각 컨트롤러 메서드에 `[AI-CONTEXT]` 주석 추가 (내부 흐름, 크로스 서비스 영향, 사이드이펙트, 주의사항)
 
 ### 산출물
 - 프로젝트 루트에 `PROJECT_CONTEXT.md`
@@ -72,8 +72,8 @@ Phase 0, 1은 산출물 유무로 판단. Phase 2 이후는 endpoints.json의 st
 
 ### 여기서 멈춤
 사람에게 **의도 검수만** 요청한다:
-- PROJECT_CONTEXT.md: 아키텍처/도메인 이해가 맞는지
-- [AI-CONTEXT] 주석: 비즈니스 의도가 정확한지
+- PROJECT_CONTEXT.md: 인덱스가 정확한지, 도메인 지식이 맞는지
+- [AI-CONTEXT] 주석: 내부 흐름과 크로스 서비스 영향이 정확한지
 
 테스트 인프라(docker-compose, 프로필, 의존성, DB 스키마)는 에이전트가 실제로 기동+연결 테스트까지 완료한 상태이므로, 사람이 동작 검증할 필요 없음.
 

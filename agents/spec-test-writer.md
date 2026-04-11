@@ -12,7 +12,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 ## 입력
 
 호출 시 다음 정보가 프롬프트에 포함됩니다:
-- `.dev/spec.md` 절대경로
+- `.ai-company/dev/{slug}/spec.md` 절대경로
 - PROJECT_CONTEXT.md 절대경로
 - docker-compose.test.yml 절대경로
 - 기존 integration/support/ 존재 여부

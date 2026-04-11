@@ -3,7 +3,15 @@
 기능 개발/수정/버그 수정을 TDD 방식으로 수행한다.
 테스트를 먼저 작성하고, 구현하고, 리뷰하고, MR을 만든다.
 
-**여러 세션에서 동시에 다른 기능을 개발할 수 있다.** 각 기능은 `.dev/{slug}/`에 독립적으로 상태를 관리한다.
+**여러 세션에서 동시에 다른 기능을 개발할 수 있다.** 각 기능은 `.ai-company/dev/{slug}/`에 독립적으로 상태를 관리한다.
+
+### 개발 원칙
+- **SOLID**: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
+- **DRY / KISS / YAGNI**
+- **Clean Architecture**: 레이어 분리 (Controller → Service → Repository)
+- **DB**: 3NF 정규화 기본, Flyway 마이그레이션 필수, 반정규화는 성능 근거 있을 때만
+
+이 원칙은 implementer가 구현 시 따르고, code-reviewer가 위반을 감지한다.
 
 인자: $ARGUMENTS
 - 기능 설명: `게시판 CRUD API 추가`
@@ -28,7 +36,7 @@ spec → red → green → reviewed → merged
 | `blocked` | 구현 불가, 사람 판단 필요 |
 | `merged` | MR 생성 완료 |
 
-상태는 `.dev/{slug}/status.json`에 기록한다:
+상태는 `.ai-company/dev/{slug}/status.json`에 기록한다:
 ```json
 {
   "slug": "board-crud",
@@ -68,9 +76,23 @@ spec → red → green → reviewed → merged
 
 ---
 
+## 마이그레이션 (v2 → v3)
+
+기존 `.dev/` 디렉토리가 존재하면 자동 감지하여 안내:
+```
+기존 .dev/ ���렉토리를 감지했습니다.
+.ai-company/dev/ 로 이동하면 새 프레임워크와 통합됩니다.
+
+이동하시겠��니까? (이동 / 나중에)
+```
+- "이동" 선택 시: `.dev/*` → `.ai-company/dev/*` 로 복사 후 안내
+- "나중에" 선택 시: 기존 `.dev/`에서 그대로 동작 (하위호환)
+
+---
+
 ## 실행 흐름
 
-`.dev/{slug}/status.json`의 status에 따라 Phase 진입:
+`.ai-company/dev/{slug}/status.json`의 status에 따라 Phase 진입:
 - `spec` → Phase 2
 - `red` → Phase 3
 - `green` → Phase 4
@@ -119,7 +141,7 @@ spec → red → green → reviewed → merged
 
 ### 산출물
 
-`.dev/{slug}/spec.md` 생성:
+`.ai-company/dev/{slug}/spec.md` 생성:
 ```markdown
 # 구현 명세: {기능 이름}
 
@@ -143,7 +165,7 @@ spec → red → green → reviewed → merged
 (대화 중 나온 엣지케이스, 제약사항)
 ```
 
-`.dev/{slug}/status.json` 생성 (status: `spec`)
+`.ai-company/dev/{slug}/status.json` 생성 (status: `spec`)
 
 ### 기능 브랜치 생성
 
@@ -171,7 +193,7 @@ status가 `spec`이거나 `--retest` 플래그가 있으면 실행한다.
 (에이전트 정의: `agents/spec-test-writer.md`)
 
 에이전트 프롬프트에 포함할 내용:
-- `.dev/{slug}/spec.md` 절대경로
+- `.ai-company/dev/{slug}/spec.md` 절대경로
 - PROJECT_CONTEXT.md 절대경로
 - docker-compose.test.yml 절대경로
 - 기존 integration/support/ 존재 여부
@@ -204,6 +226,20 @@ status가 `red`이면 실행한다.
 ### 사전 확인
 - 기능 브랜치에 있는지 확인. 없으면 `git checkout feature/{slug}` 실행.
 
+### 영향 분석 (구현 시작 전)
+
+**`impact-analyzer` 에이전트**를 실행하여 파일 충돌과 크로스 영향을 사전 확인한다.
+
+에이전트 프롬프트에 포함할 내용:
+- `.ai-company/dev/{slug}/spec.md`의 영향 범위 섹션
+- `.ai-company/project.json`의 activeWork (다른 세션 touchingFiles)
+- PROJECT_CONTEXT.md
+
+결과 처리:
+- **SAFE**: 구현 진행
+- **CAUTION**: 사이드이펙트 안내 후 구현 진행
+- **CONFLICT**: 사람에게 보고 + 선택지 (대기 / 감수하고 진행 / 순서 조정)
+
 ### 실행
 
 **`implementer` 에이전트**를 실행한다.
@@ -212,7 +248,7 @@ status가 `red`이면 실행한다.
 에이전트가 프로덕션 코드를 작성하고, 전체 테스트(새 것 + 기존 것)를 통과시킨다.
 
 에이전트 프롬프트에 포함할 내용:
-- `.dev/{slug}/spec.md` 절대경로
+- `.ai-company/dev/{slug}/spec.md` 절대경로
 - 테스트 파일 절대경로
 - PROJECT_CONTEXT.md 절대경로
 - docker-compose.test.yml 절대경로
@@ -234,7 +270,7 @@ status가 `green`이면 자동 실행한다.
 (에이전트 정의: `agents/code-reviewer.md`)
 
 에이전트 프롬프트에 포함할 내용:
-- `.dev/{slug}/spec.md` 절대경로
+- `.ai-company/dev/{slug}/spec.md` 절대경로
 - 변경된 파일 경로 목록 (status.json의 changedFiles)
 - 테스트 파일 절대경로
 - PROJECT_CONTEXT.md 절대경로
@@ -289,7 +325,7 @@ status가 `reviewed`이면 실행한다.
 
 ### Slack 설정
 
-프로젝트의 CLAUDE.md 또는 `.dev/config.json`에:
+프로젝트의 CLAUDE.md 또는 `.ai-company/config.json`에:
 ```json
 {
   "slack": {
@@ -311,4 +347,4 @@ MR 생성 완료: 게시판 CRUD API 추가 [board-crud]
   - Slack 알림: 전송됨 (#dev-pr)
 ```
 
-`.dev/{slug}/` 디렉토리는 유지한다 (이력 참조용).
+`.ai-company/dev/{slug}/` 디렉토리는 유지한다 (이력 참조용).
