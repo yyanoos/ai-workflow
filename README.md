@@ -6,8 +6,9 @@ Claude Code를 활용한 테스트 주도 개발 워크플로우 프레임워크
 
 ## 철학
 
-1. **최소 명령어**: `/gen-api-tests`와 `/dev` 두 개로 전체 워크플로우 커버
+1. **최소 명령어**: 핵심 워크플로우 몇 개로 전체 개발 사이클 커버
 2. **AI 생산성에 안정성 부여**: AI가 만든 코드를 TDD + 리뷰로 품질 보장
+3. **사람 승인 필수**: 모든 단계에서 사람이 검수 후 다음으로 진행
 
 ## 설치
 
@@ -22,51 +23,33 @@ bash install.sh
 ./install.ps1
 ```
 
-`~/.claude/commands/`와 `~/.claude/agents/`에 파일이 복사됩니다.
+`~/.claude/commands/`와 `~/.claude/agents/`에 심링크가 생성됩니다.
+(Windows에서 심링크 불가 시 자동으로 복사 방식 폴백)
 
-> 소스를 수정한 뒤에는 install 스크립트를 다시 실행해야 반영됩니다. 세션 재시작은 필요 없습니다 (slash command는 매 호출 시 파일을 새로 읽습니다).
+> 심링크 방식은 소스 수정이 즉시 반영됩니다. 복사 방식은 수정 후 install 재실행이 필요합니다.
 
-## 두 가지 워크플로우
+### 제거
 
-| 커맨드 | 용도 | 동시 세션 | 언제 사용 |
-|--------|------|-----------|----------|
-| `/gen-api-tests` | 기존 프로젝트에 테스트 커버리지 구축 | 단일 세션 | AI Workflow 최초 적용 시 |
-| `/dev` | TDD 기반 기능 개발/수정/버그 수정 | **복수 세션** (기능별 독립) | 테스트 환경 구축 후 일상 개발 |
+```bash
+# Mac/Linux
+bash install.sh --uninstall
 
----
+# Windows (PowerShell)
+./install.ps1 -Uninstall
+```
 
-## /gen-api-tests — 테스트 커버리지 구축
+## 커맨드 목록
 
-기존 프로젝트에 테스트가 없을 때, 엔드포인트 1개씩 통합 테스트를 만들어간다.
-
-> 단일 세션에서 실행할 것. endpoints.json을 공유 상태로 사용하므로 동시 실행 시 충돌 가능.
-
-### 첫 실행 시 (Phase 0~1)
-
-1. **Phase 0 - 프로젝트 분석**: 프로젝트 구조를 분석하여 아래를 생성
-   - `PROJECT_CONTEXT.md` (아키텍처, 도메인, 제약사항)
-   - 컨트롤러 메서드에 `[AI-CONTEXT]` 주석 (비자명한 비즈니스 의도)
-   - 테스트 인프라 (`docker-compose.test.yml`, 테스트 프로필, 의존성, DB 스키마)
-   - **멈춤** — 사람이 의도 검수 (인프라는 에이전트가 동작 검증 완료)
-
-2. **Phase 1 - 엔드포인트 스캔**: 모든 API 엔드포인트를 찾아 `endpoints.json` 생성
-   - **멈춤** — 사람이 검수
-
-### 이후 실행 (Phase 2~4, 엔드포인트 1개씩)
-
-3. **Phase 2 - 테스트 생성+실행**: AI가 테스트를 작성하고 직접 실행 (실패 시 자동 수정, 최대 3회)
-4. **Phase 3 - AI 리뷰**: 테스트 의도 적합성 검증 (NEEDS_WORK 시 반영+재실행+재리뷰 1회)
-   - **멈춤** — 사람이 통과한 테스트의 의도를 최종 검수
-5. **Phase 4 - 승인**: 검수 완료 후 재실행하면 done 처리, 다음 엔드포인트로 진행
-
-### 플래그
-
-| 플래그 | 용도 |
-|--------|------|
-| `POST /api/auth/login` | 특정 엔드포인트 지정 |
-| `--reanalyze` | Phase 0 강제 재실행 |
-| `--rescan` | Phase 1 강제 재실행 |
-| `--retry-failed` | 실패한 엔드포인트를 pending으로 리셋 |
+| 커맨드 | 용도 | 동시 세션 |
+|--------|------|-----------|
+| `/start` | 프로젝트 시작 — 의도 파악 후 적합한 전문가 라우팅 | - |
+| `/who` | 전문가 안내 — 프로젝트 상태에 따른 전문가 목록 + 추천 | - |
+| `/dev` | TDD 기반 기능 개발/수정/버그 수정 | **복수** (기능별 독립) |
+| `/qa` | QA — 테스트 커버리지 구축, 테스트 전략 | 단일 |
+| `/gen-api-tests` | 기존 프로젝트 테스트 커버리지 구축 (/qa의 전신) | 단일 |
+| `/evolve` | 자가발전 모드 — 별도 브랜치에서 자율 개선 | 토큰 예산 공유 |
+| `/tips` | Claude Code 기능 가이드 | - |
+| `/session-docs` | 세션 작업 요약 및 인수인계 문서 생성 | - |
 
 ---
 
@@ -74,7 +57,7 @@ bash install.sh
 
 기능 개발, 수정, 버그 수정을 TDD 방식으로 수행한다.
 
-**여러 세션에서 동시에 다른 기능을 개발할 수 있다.** 각 기능은 `.dev/{slug}/`에 독립적으로 상태를 관리하고, `feature/{slug}` 브랜치에서 작업한다.
+**여러 세션에서 동시에 다른 기능을 개발할 수 있다.** 각 기능은 `.ai-company/dev/{slug}/`에 독립적으로 상태를 관리하고, `feature/{slug}` 브랜치에서 작업한다.
 
 ```
 /dev "게시판 CRUD API 추가"     # 세션 A
@@ -85,7 +68,7 @@ bash install.sh
 
 1. **Phase 1 - 구현 명세** [대화형]: 개발자와 대화하여 spec 작성 + 기능 브랜치 생성
    - 변경 유형 파악 (신규/수정/버그) → 영향 범위, 스키마 변경, 수용 기준 합의
-   - 산출물: `.dev/{slug}/spec.md`, `feature/{slug}` 브랜치
+   - 산출물: `.ai-company/dev/{slug}/spec.md`, `feature/{slug}` 브랜치
    - **멈춤** — 사람이 spec 승인
 
 2. **Phase 2 - 테스트 작성**: 구현 명세 기반 통합 테스트 작성 + RED 확인 (컴파일 성공, 테스트 실패)
@@ -122,25 +105,88 @@ spec → red → green → reviewed → merged
 
 ---
 
-## 구성 파일
+## /qa — QA 워크플로우
+
+테스트 커버리지 구축과 테스트 전략 수립을 담당한다.
+
+```
+/qa                     # 기본: 엔드포인트 1개씩 테스트 구축
+/qa strategy            # 테스트 전략 수립
+/qa --reanalyze         # 프로젝트 재분석
+/qa --rescan            # 엔드포인트 재스캔
+/qa --retry-failed      # 실패 엔드포인트 재시도
+```
+
+---
+
+## /evolve — 자가발전 모드
+
+별도 브랜치에서 자율적으로 프로젝트를 개선한다. PR + HTML 리포트로 사람에게 제출.
+
+```
+/evolve --focus test              # 테스트 커버리지 보강
+/evolve --focus security          # 보안 점검
+/evolve --focus cleanup           # 데드코드, TODO 정리
+/evolve --max-commits 5           # 커밋 수 제한
+/evolve --status                  # 진행 상태 확인
+```
+
+---
+
+## 에이전트 구성
+
+| 에이전트 | 역할 | 사용처 |
+|----------|------|--------|
+| `project-analyzer` | 프로젝트 분석, PROJECT_CONTEXT.md 생성 | /qa Phase 0 |
+| `endpoint-scanner` | API 엔드포인트 스캔 | /qa Phase 1 |
+| `test-writer` | 기존 코드 통합 테스트 생성 | /qa Phase 2 |
+| `test-reviewer` | 테스트 품질 리뷰 (major/minor severity) | /qa Phase 3 |
+| `spec-test-writer` | 명세 기반 통합 테스트 작성 | /dev Phase 2 |
+| `implementer` | 테스트를 통과시키는 구현 | /dev Phase 3 |
+| `code-reviewer` | 코드 품질 리뷰 (major/minor severity) | /dev Phase 4 |
+| `impact-analyzer` | 변경 전 크로스 영향 분석 | /dev Phase 3 사전 |
+| `tip-advisor` | 상황별 기능 추천 (내부 참조) | 각 커맨드 |
+
+---
+
+## 프로젝트 구조
 
 ```
 ai-workflow/
 ├── commands/
-│   ├── gen-api-tests.md       ← 테스트 커버리지 구축
-│   └── dev.md                 ← TDD 기반 개발
+│   ├── start.md              ← 총괄 오케스트레이터
+│   ├── who.md                ← 전문가 안내
+│   ├── dev.md                ← TDD 기반 개발
+│   ├── qa.md                 ← QA 워크플로우
+│   ├── gen-api-tests.md      ← 테스트 커버리지 구축 (레거시)
+│   ├── evolve.md             ← 자가발전 모드
+│   ├── tips.md               ← Claude Code 기능 가이드
+│   └── session-docs.md       ← 세션 문서 생성기
 ├── agents/
-│   ├── project-analyzer.md    ← 프로젝트 분석 (gen-api-tests Phase 0)
-│   ├── endpoint-scanner.md    ← 엔드포인트 스캔 (gen-api-tests Phase 1)
-│   ├── test-writer.md         ← 기존 코드 테스트 생성 (gen-api-tests Phase 2)
-│   ├── test-reviewer.md       ← 테스트 리뷰 (gen-api-tests Phase 3)
-│   ├── spec-test-writer.md    ← 명세 기반 테스트 작성 (dev Phase 2)
-│   ├── implementer.md         ← 구현 (dev Phase 3)
-│   └── code-reviewer.md       ← 코드 리뷰 (dev Phase 4)
+│   ├── project-analyzer.md
+│   ├── endpoint-scanner.md
+│   ├── test-writer.md
+│   ├── test-reviewer.md
+│   ├── spec-test-writer.md
+│   ├── implementer.md
+│   ├── code-reviewer.md
+│   ├── impact-analyzer.md
+│   └── tip-advisor.md
 ├── install.sh / install.ps1
-├── overview.html              ← 워크플로우 시각화 (브라우저에서 열기)
+├── overview.html             ← 워크플로우 시각화 (브라우저에서 열기)
 └── README.md
 ```
+
+## 트러블슈팅
+
+| 문제 | 해결 |
+|------|------|
+| BLOCKED (구현 불가) | spec 수정: `/dev --respec`, 직접 해결 후: `/dev --from 3` |
+| FAIL (테스트 3회 실패) | `/qa --retry-failed` 후 재시도, 원인 파악: `/investigate` |
+| ERROR (인프라 문제) | `docker compose -f docker-compose.test.yml down && up -d --wait` |
+| CONFLICT (파일 충돌) | 충돌 세션 완료 대기, 또는 `/dev --list`로 현황 파악 |
+| 설치 후 커맨드 미인식 | install 스크립트 재실행, Claude Code 세션 재시작 |
+| Windows 심링크 실패 | 개발자 모드 활성화 또는 관리자 권한 실행 (자동 복사 폴백) |
 
 ## 워크플로우 개요
 
