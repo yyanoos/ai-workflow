@@ -46,7 +46,7 @@ spec → red → green → reviewed → merged
   "status": "red",
   "feature": "게시판 CRUD API 추가",
   "branch": "feature/board-crud",
-  "specFile": ".dev/board-crud/spec.md",
+  "specFile": ".ai-company/dev/board-crud/spec.md",
   "testFiles": ["src/test/.../integration/BoardControllerIT.java"],
   "changedFiles": [],
   "startedAt": "ISO 날짜",
@@ -61,12 +61,12 @@ spec → red → green → reviewed → merged
 `/dev` 실행 시 대상 기능을 결정하는 로직:
 
 ### $ARGUMENTS에 기능명이 있을 때
-1. `.dev/` 하위 디렉토리를 스캔하여 `status.json`의 `feature`와 매칭
+1. `.ai-company/dev/` 하위 디렉토리를 스캔하여 `status.json`의 `feature`와 매칭
 2. **매칭됨**: 해당 slug의 status에 따라 Phase 진입
 3. **매칭 안 됨**: 새 기능으로 판단 → slug 생성 → Phase 1
 
 ### $ARGUMENTS가 없을 때 (또는 플래그만 있을 때)
-1. `.dev/` 하위 디렉토리 스캔
+1. `.ai-company/dev/` 하위 디렉토리 스캔
 2. 진행 중인 기능(`merged`가 아닌 것)이 **1개**: 해당 기능으로 자동 진입
 3. 진행 중인 기능이 **여러 개**: 목록을 보여주고 선택 요청
 4. 진행 중인 기능이 **없음**: "기능 설명을 입력해주세요" 안내
