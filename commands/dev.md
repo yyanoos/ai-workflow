@@ -13,6 +13,9 @@
 
 이 원칙은 implementer가 구현 시 따르고, code-reviewer가 위반을 감지한다.
 
+### tip 출력 규칙
+각 "여기서 멈춤" 시점에 `agents/tip-advisor.md`를 참조하여 상황에 맞는 tip을 1개 출력한다. 단, 세션 내 이미 안내한 tip은 반복하지 않는다.
+
 인자: $ARGUMENTS
 - 기능 설명: `게시판 CRUD API 추가`
 - Phase 강제 재실행: `--respec` (Phase 1), `--retest` (Phase 2)
