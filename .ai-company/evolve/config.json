@@ -1,0 +1,15 @@
+{
+  "focus": ["harness-engineering"],
+  "direction": "하네스 엔지니어링 강화 - 에이전트/커맨드 품질 개선, 일관성 확보, 누락 기능 보강",
+  "priorities": [
+    "에이전트 간 일관성 확보",
+    "설치 스크립트 견고성 강화",
+    "세션 문서 생성 커맨드 추가",
+    "에이전트 출력 형식 통일",
+    "누락된 에러 복구 가이드 추가"
+  ],
+  "exclude": [],
+  "stopConditions": {
+    "global": { "maxCommits": 8, "maxTime": "2h" }
+  }
+}

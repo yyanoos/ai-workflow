@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자가발전 리포트 — 2026-04-12</title>
+<style>
+  :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; --green: #3fb950; --red: #f85149; --yellow: #d29922; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; max-width: 960px; margin: 0 auto; }
+  h1 { color: #f0f6fc; margin-bottom: .5rem; font-size: 1.5rem; }
+  .subtitle { color: #8b949e; margin-bottom: 2rem; }
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; text-align: center; }
+  .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+  .stat-label { font-size: .8rem; color: #8b949e; }
+  .commit { background: var(--card); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 1rem; overflow: hidden; }
+  .commit-header { padding: 1rem; cursor: pointer; display: flex; align-items: center; gap: .75rem; }
+  .commit-header:hover { background: #1c2128; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: .75rem; font-weight: 600; }
+  .badge-fix { background: #f8514920; color: var(--red); border: 1px solid #f8514940; }
+  .badge-enhance { background: #58a6ff20; color: var(--accent); border: 1px solid #58a6ff40; }
+  .badge-add { background: #3fb95020; color: var(--green); border: 1px solid #3fb95040; }
+  .badge-rewrite { background: #d2992220; color: var(--yellow); border: 1px solid #d2992240; }
+  .commit-title { flex: 1; }
+  .commit-files { font-size: .8rem; color: #8b949e; }
+  .commit-body { padding: 0 1rem 1rem; border-top: 1px solid var(--border); display: none; }
+  .commit.open .commit-body { display: block; padding-top: 1rem; }
+  .diff { background: #0d1117; border-radius: 4px; padding: 1rem; margin-top: .5rem; font-family: 'SF Mono', Consolas, monospace; font-size: .8rem; overflow-x: auto; white-space: pre-wrap; }
+  .diff-add { color: var(--green); }
+  .diff-del { color: var(--red); }
+  .impact { margin-top: 1rem; padding: .75rem; background: #1c2128; border-radius: 4px; font-size: .85rem; }
+  .impact-safe { border-left: 3px solid var(--green); }
+  .guide { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; margin-top: 2rem; }
+  .guide h2 { color: #f0f6fc; margin-bottom: 1rem; font-size: 1.1rem; }
+  .guide ul { padding-left: 1.5rem; }
+  .guide li { margin-bottom: .5rem; }
+  code { background: #1c2128; padding: 2px 6px; border-radius: 3px; font-size: .85em; }
+</style>
+</head>
+<body>
+
+<h1>자가발전 리포트</h1>
+<p class="subtitle">2026-04-12 | 브랜치: evolve/2026-04-12 | 방향: 하네스 엔지니어링 강화</p>
+
+<div class="summary">
+  <div class="stat"><div class="stat-value">8</div><div class="stat-label">커밋</div></div>
+  <div class="stat"><div class="stat-value">10</div><div class="stat-label">변경 파일</div></div>
+  <div class="stat"><div class="stat-value">+335</div><div class="stat-label">추가</div></div>
+  <div class="stat"><div class="stat-value">-82</div><div class="stat-label">삭제</div></div>
+</div>
+
+<!-- Commit 1 -->
+<div class="commit" onclick="this.classList.toggle('open')">
+  <div class="commit-header">
+    <span class="badge badge-fix">fix</span>
+    <span class="commit-title">gen-api-tests 경로를 .ai-company/qa/coverage/로 통일</span>
+    <span class="commit-files">1 file</span>
+  </div>
+  <div class="commit-body">
+    <p>qa.md에서는 이미 <code>.ai-company/qa/coverage/endpoints.json</code>을 사용하지만 gen-api-tests.md는 여전히 <code>.test-coverage/</code>를 참조하고 있었음.</p>
+    <div class="diff"><span class="diff-del">- `.test-coverage/endpoints.json`이 없거나</span>
+<span class="diff-add">+ `.ai-company/qa/coverage/endpoints.json`이 없거나</span>
+
+<span class="diff-add">+ ### 마이그레이션 (v2 → v3)</span>
+<span class="diff-add">+ 기존 .test-coverage/ → .ai-company/qa/coverage/ 이동 안내 추가</span></div>
+    <div class="impact impact-safe">영향: 없음 (문서 수정). gen-api-tests와 qa 간 경로 일관성 확보.</div>
+  </div>
+</div>
+
+<!-- Commit 2 -->
+<div class="commit" onclick="this.classList.toggle('open')">
+  <div class="commit-header">
+    <span class="badge badge-fix">fix</span>
+    <span class="commit-title">dev.md 내 .dev/ 참조를 .ai-company/dev/로 통일</span>
+    <span class="commit-files">1 file</span>
+  </div>
+  <div class="commit-body">
+    <p>status.json 예시의 specFile 경로와 slug 식별 로직의 디렉토리 참조가 v2 경로(<code>.dev/</code>)를 그대로 쓰고 있었음.</p>
+    <div class="diff"><span class="diff-del">- "specFile": ".dev/board-crud/spec.md"</span>
+<span class="diff-add">+ "specFile": ".ai-company/dev/board-crud/spec.md"</span>
+
+<span class="diff-del">- 1. `.dev/` 하위 디렉토리를 스캔하여</span>
+<span class="diff-add">+ 1. `.ai-company/dev/` 하위 디렉토리를 스캔하여</span></div>
+    <div class="impact impact-safe">영향: 없음 (문서 수정). v3 경로 체계와 일관성 확보.</div>
+  </div>
+</div>
+
+<!-- Commit 3 -->
+<div class="commit" onclick="this.classList.toggle('open')">
+  <div class="commit-header">
+    <span class="badge badge-enhance">enhance</span>
+    <span class="commit-title">install 스크립트 견고성 강화</span>
+    <span class="commit-files">2 files</span>
+  </div>
+  <div class="commit-body">
+    <p>install.sh와 install.ps1에 다음을 추가:</p>
+    <ul>
+      <li>언인스톨 옵션 (<code>--uninstall</code> / <code>-Uninstall</code>)</li>
+      <li>설치 후 검증 (설치 개수 vs 확인 개수)</li>
+      <li>전체 주요 커맨드 안내 (/evolve, /tips 등)</li>
+      <li>bash: <code>set -euo pipefail</code></li>
+      <li>ps1: <code>param()</code> 블록, .claude 디렉토리 미존재 시 생성</li>
+    </ul>
+    <div class="diff"><span class="diff-add">+ # --uninstall 옵션</span>
+<span class="diff-add">+ if [[ "${1:-}" == "--uninstall" ]]; then</span>
+<span class="diff-add">+   echo "AI Workflow 제거 중..."</span>
+<span class="diff-add">+   ...</span>
+<span class="diff-add">+ fi</span>
+
+<span class="diff-add">+ # 검증</span>
+<span class="diff-add">+ echo "  커맨드: ${CMD_COUNT}개 설치 (${INSTALLED_CMDS}개 확인)"</span></div>
+    <div class="impact impact-safe">영향: 기존 설치 동작은 동일. 언인스톨과 검증은 새 기능.</div>
+  </div>
+</div>
+
+<!-- Commit 4 -->
+<div class="commit" onclick="this.classList.toggle('open')">
+  <div class="commit-header">
+    <span class="badge badge-enhance">enhance</span>
+    <span class="commit-title">test-reviewer에 severity 체계 추가</span>
+    <span class="commit-files">1 file</span>
+  </div>
+  <div class="commit-body">
+    <p>code-reviewer와 동일한 <code>[severity: major/minor]</code> 태그를 test-reviewer 출력 형식에 추가. 카테고리 필드도 추가하여 발견사항의 분류를 명확화.</p>
+    <div class="diff"><span class="diff-del">- ### 추가할 테스트 케이스</span>
+<span class="diff-add">+ ### [severity: major] 추가할 테스트 케이스</span>
+<span class="diff-add">+   - 카테고리: 인증/인가 엣지케이스</span>
+
+<span class="diff-add">+ | severity | 의미 | 예시 |</span>
+<span class="diff-add">+ | major | 보안/인증/데이터 무결성 관련 누락 | 권한 체크 미테스트 |</span>
+<span class="diff-add">+ | minor | 커버리지 보강 | 응답 필드 추가 검증 |</span></div>
+    <div class="impact impact-safe">영향: test-reviewer의 출력 형식 변경. qa.md/dev.md에서 severity 기반 분기 가능.</div>
+  </div>
+</div>
+
+<!-- Commit 5 -->
+<div class="commit" onclick="this.classList.toggle('open')">
+  <div class="commit-header">
+    <span class="badge badge-add">add</span>
+    <span class="commit-title">session-docs 커맨드 추가</span>
+    <span class="commit-files">1 file (new)</span>
+  </div>
+  <div class="commit-body">
+    <p>세션 종료 시 작업 요약과 인수인계 문서를 생성하는 <code>/session-docs</code> 커맨드. brief(5줄 요약)와 handoff(상세 문서) 형식 지원.</p>
+    <div class="diff"><span class="diff-add">+ # 세션 문서 생성기</span>
+<span class="diff-add">+ ## brief 형식: 5줄 이내 요약</span>
+<span class="diff-add">+ ## handoff 형식: .ai-company/session-log-{날짜}.md 저장</span>
+<span class="diff-add">+   - 수행한 작업, 현재 상태, 알려진 이슈, 다음 단계, 의사결정 기록</span></div>
+    <div class="impact impact-safe">영향: 없음 (신규 파일). 기존 워크플로우에 영향 없음.</div>
+  </div>
+</div>
+
+<!-- Commit 6 -->
+<div class="commit" onclick="this.classList.toggle('open')">
+  <div class="commit-header">
+    <span class="badge badge-enhance">enhance</span>
+    <span class="commit-title">tip-advisor에 에러 복구 가이드 추가</span>
+    <span class="commit-files">1 file</span>
+  </div>
+  <div class="commit-body">
+    <p>BLOCKED, FAIL, ERROR, CONFLICT, NEEDS_WORK 등 에러 상황별 구체적인 복구 방법을 안내하는 tip 섹션 추가. 세션 종료 전 <code>/session-docs</code> 안내도 추가.</p>
+    <div class="diff"><span class="diff-add">+ ### 에러 복구</span>
+<span class="diff-add">+ | BLOCKED | /dev --respec 또는 /dev --from 3 |</span>
+<span class="diff-add">+ | FAIL    | /qa --retry-failed + /investigate |</span>
+<span class="diff-add">+ | ERROR   | docker compose down && up |</span>
+<span class="diff-add">+ | CONFLICT| 충돌 세션 대기 또는 /dev --list |</span></div>
+    <div class="impact impact-safe">영향: 없음 (참조 문서 보강). 에러 시 사용자 가이드 개선.</div>
+  </div>
+</div>
+
+<!-- Commit 7 -->
+<div class="commit" onclick="this.classList.toggle('open')">
+  <div class="commit-header">
+    <span class="badge badge-rewrite">rewrite</span>
+    <span class="commit-title">README를 전체 커맨드/에이전트 반영하여 재작성</span>
+    <span class="commit-files">1 file</span>
+  </div>
+  <div class="commit-body">
+    <p>v3 커맨드 전체 반영, 에이전트 목록 전체 포함, 트러블슈팅 섹션 추가, 설치/제거 방법 업데이트.</p>
+    <div class="diff"><span class="diff-del">- "최소 명령어": `/gen-api-tests`와 `/dev` 두 개로</span>
+<span class="diff-add">+ "최소 명령어": 핵심 워크플로우 몇 개로 전체 개발 사이클 커버</span>
+
+<span class="diff-add">+ ## 커맨드 목록 (8개 전체)</span>
+<span class="diff-add">+ ## 에이전트 구성 (9개 전체)</span>
+<span class="diff-add">+ ## 트러블슈팅 (6개 시나리오)</span></div>
+    <div class="impact impact-safe">영향: 없음 (문서 재작성). 기능 변경 없음.</div>
+  </div>
+</div>
+
+<!-- Commit 8 -->
+<div class="commit" onclick="this.classList.toggle('open')">
+  <div class="commit-header">
+    <span class="badge badge-enhance">enhance</span>
+    <span class="commit-title">qa.md Phase 3에 severity 기반 처리 분기 명시</span>
+    <span class="commit-files">1 file</span>
+  </div>
+  <div class="commit-body">
+    <p>test-reviewer에 추가된 major/minor severity에 맞춰 qa.md의 리뷰 결과 처리 로직을 명확화.</p>
+    <div class="diff"><span class="diff-del">- 1차 NEEDS_WORK → 반영 + 재실행 + 2차 리뷰</span>
+<span class="diff-add">+ ### 1차 리뷰 결과 처리</span>
+<span class="diff-add">+ - PASS: 여기서 멈춤</span>
+<span class="diff-add">+ - NEEDS_WORK:</span>
+<span class="diff-add">+   - major: 반드시 반영 (보안/인증/데이터 무결성)</span>
+<span class="diff-add">+   - minor: 반영 권장, 사람 판단으로 스킵 가능</span></div>
+    <div class="impact impact-safe">영향: qa 워크플로우의 리뷰 처리가 더 명확해짐. 기존 동작과 호환.</div>
+  </div>
+</div>
+
+<div class="guide">
+  <h2>승인/거절 가이드</h2>
+  <ul>
+    <li><strong>전체 승인</strong>: PR을 merge하면 모든 변경사항이 반영됩니다.</li>
+    <li><strong>부분 승인</strong>: 원하는 커밋만 cherry-pick할 수 있습니다.
+      <br><code>git cherry-pick 71fe041 febe2c6 96d7bd0</code> (원하는 커밋 해시)</li>
+    <li><strong>거절</strong>: PR을 닫고 브랜치를 삭제합니다.
+      <br><code>git branch -D evolve/2026-04-12</code></li>
+  </ul>
+</div>
+
+<script>
+// 첫 번째 커밋을 기본으로 열어둠
+document.querySelector('.commit').classList.add('open');
+</script>
+
+</body>
+</html>
