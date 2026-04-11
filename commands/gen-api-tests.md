@@ -81,8 +81,20 @@ Phase 0, 1은 산출물 유무로 판단. Phase 2 이후는 endpoints.json의 st
 
 ## Phase 1: 엔드포인트 스캔 (endpoints.json 없을 때)
 
-`.test-coverage/endpoints.json`이 없거나, `--rescan` 플래그가 있으면 실행한다.
+`.ai-company/qa/coverage/endpoints.json`이 없거나, `--rescan` 플래그가 있으면 실행한다.
 `--rescan` 시 기존 endpoints.json을 덮어쓰되, `"done"`, `"review"`, `"failed"` 상태는 유지한다.
+
+### 마이그레이션 (v2 → v3)
+
+기존 `.test-coverage/` 디렉토리가 존재하면 자동 감지하여 안내:
+```
+기존 .test-coverage/ 디렉토리를 감지했습니다.
+.ai-company/qa/coverage/ 로 이동하면 새 프레임워크와 통합됩니다.
+
+이동하시겠습니까? (이동 / 나중에)
+```
+- "이동" 선택 시: `.test-coverage/*` → `.ai-company/qa/coverage/*` 로 복사
+- "나중에" 선택 시: 기존 `.test-coverage/`에서 그대로 동작 (하위호환)
 
 ### 실행
 
@@ -93,10 +105,10 @@ Phase 0, 1은 산출물 유무로 판단. Phase 2 이후는 endpoints.json의 st
 - 프로젝트 루트 절대경로
 - `--rescan` 시: 기존 endpoints.json의 내용을 JSON 텍스트로 포함 (done/review 상태 보존용)
 
-`.test-coverage/`는 git에 커밋한다 (팀원과 진행 상태 공유)
+`.ai-company/qa/coverage/`는 git에 커밋한다 (팀원과 진행 상태 공유)
 
 ### 산출물
-- `.test-coverage/endpoints.json`
+- `.ai-company/qa/coverage/endpoints.json`
 - 스캔 결과 요약 출력 (총 엔드포인트 수, 컨트롤러별 수)
 
 ### 여기서 멈춤
