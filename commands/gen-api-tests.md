@@ -18,7 +18,9 @@
 
 ## 실행
 
-`/qa test-coverage`와 동일한 흐름을 따른다. 상세는 `commands/qa.md` 참조.
+**이 커맨드는 `/qa test-coverage`와 동일하게 동작한다.**
+`commands/qa.md`를 읽고, test-coverage 모드의 절차를 그대로 따라라.
+$ARGUMENTS는 그대로 전달한다.
 
 ### 상태 파일 위치
 

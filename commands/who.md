@@ -44,11 +44,11 @@
 ▸ QA팀 (/qa)
   - QA 엔지니어 — 테스트 전략, 커버리지 구축
 
-▸ DevOps (/consult devops)
-▸ 보안 (/consult security)
-▸ 마케팅팀 (/consult marketing)
-▸ 운영팀 (/consult ops)
-▸ 인프라 (/consult infra)
+▸ DevOps (/consult devops) — CI/CD, 인프라, 배포, 모니터링
+▸ 보안 (/consult security) — OWASP, 취약점 분석, 보안감사
+▸ 마케팅팀 (/consult marketing) — 채널전략, SEO, 카피, 퍼널
+▸ 운영팀 (/consult ops) — 지표 설계, 대시보드, CS FAQ
+▸ 인프라 (/consult infra) — 서버 진단, DB 관리, 성능 튜닝
 
 ▸ 공통
   - 영향 분석가 (impact-analyzer) — 변경 전 크로스 영향 분석
