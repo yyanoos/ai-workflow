@@ -46,7 +46,8 @@ spec → red → green → reviewed → merged
   "status": "red",
   "feature": "게시판 CRUD API 추가",
   "branch": "feature/board-crud",
-  "specFile": ".dev/board-crud/spec.md",
+  "worktreePath": "../ai-workflow-dev-board-crud",
+  "specFile": ".ai-company/dev/board-crud/spec.md",
   "testFiles": ["src/test/.../integration/BoardControllerIT.java"],
   "changedFiles": [],
   "startedAt": "ISO 날짜",
@@ -170,13 +171,22 @@ spec → red → green → reviewed → merged
 
 `.ai-company/dev/{slug}/status.json` 생성 (status: `spec`)
 
-### 기능 브랜치 생성
+### 기능 브랜치 생성 (Worktree 격리)
 
-spec 승인 후 기능 브랜치를 생성한다:
+spec 승인 후 **git worktree**로 격리된 작업 공간을 생성한다:
 - 브랜치명: `feature/{slug}` (예: `feature/board-crud`)
-- 사람에게 확인: "feature/{slug} 브랜치를 생성할까요?"
-- 승인 시 `git checkout -b feature/{slug}` 실행
-- status.json에 `branch` 필드 기록
+- 사람에게 확인: "feature/{slug} 브랜치를 worktree로 생성할까요?"
+- 승인 시:
+  ```bash
+  git worktree add ../{프로젝트명}-dev-{slug} -b feature/{slug}
+  ```
+  예: `git worktree add ../ai-workflow-dev-board-crud -b feature/board-crud`
+- status.json에 `branch`, `worktreePath` 필드 기록
+- **이후 모든 Phase는 worktree 경로에서 작업한다**
+
+> **왜 worktree인가?**
+> `git checkout`은 워킹 디렉토리 전체를 교체한다. 현재 브랜치에서 다른 세션(evolve 등)이 작업 중이면 파일이 덮어씌워진다.
+> worktree는 같은 .git을 공유하되 물리적으로 분리된 디렉토리를 만들어 진정한 병렬 작업이 가능하다.
 
 ### 여기서 멈춤
 사람에게 spec.md를 보여주고 승인을 요청한다. 수용 기준이 맞는지 확인하라고 안내.
@@ -188,7 +198,8 @@ spec 승인 후 기능 브랜치를 생성한다:
 status가 `spec`이거나 `--retest` 플래그가 있으면 실행한다.
 
 ### 사전 확인
-- 기능 브랜치에 있는지 확인. 없으면 `git checkout feature/{slug}` 실행.
+- worktree 경로가 존재하는지 확인. 없으면 worktree 생성.
+- worktree 경로에서 기능 브랜치가 체크아웃되어 있는지 확인.
 
 ### 실행
 
@@ -227,7 +238,7 @@ RED 상태인 테스트를 사람에게 보여주고 검수를 요청한다.
 status가 `red`이면 실행한다.
 
 ### 사전 확인
-- 기능 브랜치에 있는지 확인. 없으면 `git checkout feature/{slug}` 실행.
+- worktree 경로에서 기능 브랜치가 체크아웃되어 있는지 확인.
 
 ### 영향 분석 (구현 시작 전)
 
@@ -312,7 +323,7 @@ status → `reviewed`.
 status가 `reviewed`이면 실행한다.
 
 ### 사전 확인
-1. 기능 브랜치에 있는지 확인
+1. worktree 경로에서 기능 브랜치가 체크아웃되어 있는지 확인
 2. 전체 테스트 최종 실행 — 통과 확인
 3. status가 `reviewed`인지 확인
 
@@ -351,3 +362,11 @@ MR 생성 완료: 게시판 CRUD API 추가 [board-crud]
 ```
 
 `.ai-company/dev/{slug}/` 디렉토리는 유지한다 (이력 참조용).
+
+### Worktree 정리
+
+MR 생성 완료 후 worktree를 정리한다:
+```bash
+git worktree remove ../{프로젝트명}-dev-{slug}
+```
+브랜치는 삭제하지 않는다 (PR 머지 후 GitHub이 자동 삭제하거나 사람이 판단).
