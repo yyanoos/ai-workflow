@@ -18,7 +18,7 @@
 ## 핵심 원칙
 
 1. **사용자 토큰 보장**: 사용자 평소 사용량은 성역. 남는 여유분에서만 작업.
-2. **별도 브랜치**: main/master 직접 수정 금지. `evolve/{세션ID}` 브랜치에서만.
+2. **별도 브랜치 + Worktree 격리**: main/master 직접 수정 금지. `evolve/{세션ID}` 브랜치를 git worktree로 물리적으로 분리된 디렉토리에서 작업.
 3. **사람 승인 필수**: 자동 merge 절대 금지. PR + HTML before/after 리포트로 제출.
 4. **멀티 프로젝트 공정 분배**: 여러 프로젝트에서 동시 실행 시 독점 불가.
 
@@ -46,7 +46,9 @@
 7. 할당량 계산 (다른 활성 세션과 공정 분배)
 8. `.ai-company/evolve/sessions/{세션ID}/config.json` 생성 (방향, 종료조건)
 9. `.ai-company/evolve/sessions/{세션ID}/tracking.json` 생성 (브랜치/PR/머지 상태 추적)
-10. `evolve/{세션ID}` 브랜치 생성
+10. **Worktree 생성**: `git worktree add ../{프로젝트명}-evolve-{세션ID} -b evolve/{세션ID}`
+    - 예: `git worktree add ../ai-workflow-evolve-2026-04-12_test-coverage -b evolve/2026-04-12_test-coverage`
+    - 이후 모든 작업은 이 worktree 경로에서 수행
 
 ### 3. 작업 사이클
 
@@ -491,11 +493,17 @@ evolve 실행 시 `learnings.json`을 읽고:
 
 | 자원 | 경로/이름 | 격리 방식 |
 |------|----------|----------|
+| **worktree** | `../{프로젝트명}-evolve-{세션ID}/` | 물리적으로 분리된 디렉토리 |
 | 브랜치 | `evolve/{세션ID}` | 세션별 독립 브랜치 |
 | config | `.ai-company/evolve/sessions/{세션ID}/config.json` | 세션별 독립 파일 |
 | tracking | `.ai-company/evolve/sessions/{세션ID}/tracking.json` | 세션별 독립 파일 |
 | 리포트 | `.ai-company/evolve/sessions/{세션ID}/report.html` | 세션별 독립 파일 |
 | PR | `evolve/{세션ID}` → main | 세션별 독립 PR |
+
+> **Worktree 격리 원칙**
+> `git checkout`은 워킹 디렉토리 전체를 교체하므로, 동시에 여러 세션이 다른 브랜치에서 작업할 수 없다.
+> `git worktree`는 같은 `.git`을 공유하되 물리적으로 분리된 디렉토리를 생성하여 진정한 병렬 작업을 보장한다.
+> evolve 세션, dev 세션, 사용자 작업이 모두 동시에 각자의 브랜치에서 독립적으로 진행된다.
 
 ### 공유되는 자원 (읽기 전용 or append-only)
 
@@ -509,6 +517,14 @@ evolve 실행 시 `learnings.json`을 읽고:
 
 - 각 세션은 focus가 다르므로 보통 다른 파일을 건드림
 - 만약 같은 파일을 수정해야 하면: `git diff`로 다른 evolve 브랜치에서 해당 파일이 변경됐는지 확인 → 변경됐으면 해당 파일 스킵
+
+### Worktree 정리
+
+세션 종료 시 (PR 생성 후) worktree를 정리한다:
+```bash
+git worktree remove ../{프로젝트명}-evolve-{세션ID}
+```
+브랜치는 삭제하지 않는다 (PR 머지/반려 후 판단).
 
 ---
 
