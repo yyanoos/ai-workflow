@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자가발전 리포트 — 2026-04-12-1896</title>
+<style>
+  :root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--accent:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#d29922;--purple:#bc8cff}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:2rem;max-width:960px;margin:0 auto}
+  h1{color:#f0f6fc;margin-bottom:.5rem;font-size:1.5rem}
+  .sub{color:#8b949e;margin-bottom:2rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1rem;margin-bottom:2rem}
+  .s{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:1rem;text-align:center}
+  .sv{font-size:1.8rem;font-weight:700;color:var(--accent)}.sl{font-size:.8rem;color:#8b949e}
+  .sv.green{color:var(--green)}.sv.red{color:var(--red)}
+  .c{background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:1rem;overflow:hidden}
+  .ch{padding:1rem;cursor:pointer;display:flex;align-items:center;gap:.75rem}
+  .ch:hover{background:#1c2128}
+  .b{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.75rem;font-weight:600}
+  .b-r{background:#58a6ff20;color:var(--accent);border:1px solid #58a6ff40}
+  .b-a{background:#3fb95020;color:var(--green);border:1px solid #3fb95040}
+  .b-e{background:#bc8cff20;color:var(--purple);border:1px solid #bc8cff40}
+  .ct{flex:1}.cf{font-size:.8rem;color:#8b949e}
+  .cb{padding:0 1rem 1rem;border-top:1px solid var(--border);display:none}
+  .c.open .cb{display:block;padding-top:1rem}
+  .im{margin-top:.75rem;padding:.75rem;background:#1c2128;border-radius:4px;font-size:.85rem;border-left:3px solid var(--green)}
+  .g{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:1.5rem;margin-top:2rem}
+  .g h2{color:#f0f6fc;margin-bottom:1rem;font-size:1.1rem}
+  .g ul{padding-left:1.5rem}.g li{margin-bottom:.5rem}
+  code{background:#1c2128;padding:2px 6px;border-radius:3px;font-size:.85em}
+  .focus{display:flex;gap:.5rem;margin-bottom:2rem;flex-wrap:wrap}
+  .ft{padding:4px 12px;border-radius:16px;font-size:.8rem;border:1px solid var(--border);background:var(--card)}
+  .ft.active{border-color:var(--accent);color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:1rem 0}
+  th,td{padding:.5rem .75rem;text-align:left;border-bottom:1px solid var(--border)}
+  th{color:#8b949e;font-size:.8rem;font-weight:600}
+</style>
+</head>
+<body>
+
+<h1>자가발전 리포트</h1>
+<p class="sub">세션 2026-04-12-1896 | 브랜치: evolve/2026-04-12-1896</p>
+
+<div class="focus">
+  <span class="ft active">하네스 엔지니어링 강화</span>
+  <span class="ft active">전문가 생성</span>
+  <span class="ft active">컨텍스트 경량화</span>
+</div>
+
+<div class="grid">
+  <div class="s"><div class="sv">8</div><div class="sl">커밋</div></div>
+  <div class="s"><div class="sv green">+327</div><div class="sl">추가</div></div>
+  <div class="s"><div class="sv red">-638</div><div class="sl">삭제</div></div>
+  <div class="s"><div class="sv">-311</div><div class="sl">순감축</div></div>
+</div>
+
+<h2 style="color:#f0f6fc;margin-bottom:1rem">컨텍스트 경량화 결과</h2>
+<table>
+  <tr><th>파일</th><th>Before</th><th>After</th><th>감축</th></tr>
+  <tr><td>dev.md</td><td>353줄</td><td>146줄</td><td><strong>-59%</strong></td></tr>
+  <tr><td>gen-api-tests.md</td><td>201줄</td><td>38줄</td><td><strong>-81%</strong></td></tr>
+  <tr><td>tips.md</td><td>174줄</td><td>56줄</td><td><strong>-68%</strong></td></tr>
+  <tr><td>who.md</td><td>132줄</td><td>114줄</td><td>-14%</td></tr>
+  <tr><th>합계</th><th>860줄</th><th>354줄</th><th><strong>-59%</strong></th></tr>
+</table>
+
+<h2 style="color:#f0f6fc;margin:2rem 0 1rem">변경사항</h2>
+
+<div class="c" onclick="this.classList.toggle('open')">
+  <div class="ch">
+    <span class="b b-r">refactor</span>
+    <span class="ct">dev.md 353줄→146줄 경량화</span>
+    <span class="cf">-59%</span>
+  </div>
+  <div class="cb">
+    <p>에이전트에 이미 정의된 Phase별 세부 절차를 제거. 상태 머신 + 오케스트레이션 로직만 유지.</p>
+    <p><strong>제거한 것:</strong> Phase 1 질문 상세, Phase 2~4 에이전트 내부 동작 설명, 개발 원칙(SOLID/DRY) 중복, Slack 설정 예시</p>
+    <p><strong>유지한 것:</strong> 상태 머신, slug 식별, Phase 라우팅, 에이전트 호출 파라미터, 멈춤 조건</p>
+    <div class="im">정보 손실 없음. 제거된 내용은 모두 에이전트 .md에 존재. 메인 세션 컨텍스트 ~200줄 절약.</div>
+  </div>
+</div>
+
+<div class="c" onclick="this.classList.toggle('open')">
+  <div class="ch">
+    <span class="b b-r">refactor</span>
+    <span class="ct">gen-api-tests 201줄→38줄 축소</span>
+    <span class="cf">-81%</span>
+  </div>
+  <div class="cb">
+    <p><code>/qa test-coverage</code>와 완전 중복이므로 경량 리다이렉트 + Phase 요약표로 축소. 하위호환 유지.</p>
+    <div class="im">기능 변경 없음. /qa의 세부 흐름을 참조하도록 변경. ~160줄 절약.</div>
+  </div>
+</div>
+
+<div class="c" onclick="this.classList.toggle('open')">
+  <div class="ch">
+    <span class="b b-r">refactor</span>
+    <span class="ct">tips.md 174줄→56줄 경량화</span>
+    <span class="cf">-68%</span>
+  </div>
+  <div class="cb">
+    <p>코드 블록 내 장문 설명을 핵심 2-3줄로 압축. 예시 출력/중복 설명 제거.</p>
+    <div class="im">기능 동일. 핵심 정보 유지하면서 ~120줄 절약.</div>
+  </div>
+</div>
+
+<div class="c" onclick="this.classList.toggle('open')">
+  <div class="ch">
+    <span class="b b-a">add</span>
+    <span class="ct">domain-expert 범용 전문가 에이전트</span>
+    <span class="cf">89줄 (new)</span>
+  </div>
+  <div class="cb">
+    <p>역할을 동적으로 지정받아 해당 도메인 전문가로 작업하는 범용 에이전트. /who에서 참조하는 9개 부서를 개별 에이전트 없이 하나로 커버.</p>
+    <p><strong>지원 역할:</strong> 전략, 법무, 기획, 디자인, 보안, 마케팅, 운영, DevOps, 인프라</p>
+    <div class="im">신규 에이전트. 기존 코드에 영향 없음. 서브에이전트로만 호출됨.</div>
+  </div>
+</div>
+
+<div class="c" onclick="this.classList.toggle('open')">
+  <div class="ch">
+    <span class="b b-a">add</span>
+    <span class="ct">/consult 범용 전문가 상담 커맨드</span>
+    <span class="cf">74줄 (new)</span>
+  </div>
+  <div class="cb">
+    <p>/who에서 안내하는 모든 부서에 단일 진입점으로 작업을 맡기는 커맨드. <code>/consult strategy "시장 분석"</code>, <code>/consult security "보안감사"</code> 등.</p>
+    <p>부서 자동 판단 기능 포함: <code>/consult "약관 만들어줘"</code> → legal로 자동 라우팅.</p>
+    <div class="im">신규 커맨드. /who, /start에서 참조하는 미구현 커맨드 문제 해결.</div>
+  </div>
+</div>
+
+<div class="c" onclick="this.classList.toggle('open')">
+  <div class="ch">
+    <span class="b b-e">enhance</span>
+    <span class="ct">who.md 부서 목록을 /consult와 연동</span>
+    <span class="cf">132→114줄</span>
+  </div>
+  <div class="cb">
+    <p>미구현 부서 커맨드(<code>/strategy</code>, <code>/legal</code> 등)를 실제 실행 가능한 <code>/consult {부서}</code>로 교체.</p>
+    <div class="im">이제 /who에서 안내하는 모든 커맨드가 실행 가능.</div>
+  </div>
+</div>
+
+<div class="c" onclick="this.classList.toggle('open')">
+  <div class="ch">
+    <span class="b b-e">enhance</span>
+    <span class="ct">start.md 라우팅을 /consult로 통일</span>
+    <span class="cf">9줄 변경</span>
+  </div>
+  <div class="cb">
+    <p>/start에서 추천하는 부서 커맨드를 /consult 경로로 통일. 추천 → 바로 실행 가능.</p>
+    <div class="im">기존 동작 호환. 라우팅 경로만 변경.</div>
+  </div>
+</div>
+
+<div class="c" onclick="this.classList.toggle('open')">
+  <div class="ch">
+    <span class="b b-a">add</span>
+    <span class="ct">evolve 세션 설정 및 학습 기록</span>
+    <span class="cf">2 files</span>
+  </div>
+  <div class="cb">
+    <p>세션 config.json과 이전 PR 거절에서의 학습 기록.</p>
+    <div class="im">evolve 인프라 파일. 다음 evolve 세션에서 학습 활용.</div>
+  </div>
+</div>
+
+<div class="g">
+  <h2>승인/거절 가이드</h2>
+  <ul>
+    <li><strong>전체 승인</strong>: PR merge</li>
+    <li><strong>부분 승인</strong>: 원하는 커밋만 cherry-pick
+      <br><code>git cherry-pick f1e3cae aaa703e e1a5ae7</code> (경량화만)
+      <br><code>git cherry-pick df7f262 9239612 5b6f637 5510d06</code> (전문가 생성만)</li>
+    <li><strong>거절</strong>: PR 닫고 <code>git branch -D evolve/2026-04-12-1896</code></li>
+  </ul>
+</div>
+
+<script>document.querySelector('.c').classList.add('open')</script>
+</body>
+</html>

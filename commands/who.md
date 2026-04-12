@@ -22,58 +22,40 @@
 
 현재 프로젝트: 노인 돌봄 매칭 앱 (phase: product)
 
-▸ 전략실 (/strategy)
-  - 비즈니스 분석가 — 시장조사, 경쟁분석, TAM/SAM/SOM
-  - 재무 분석가 — 수익모델, 단가분석, 재무예측
+▸ 전략실 (/consult strategy)
+  - 비즈니스 분석가, 재무 분석가
   ✓ 완료됨
 
-▸ 법무팀 (/legal)
-  - 법률 자문 — 사업자등록, 약관, 개인정보처리방침
-  - 세무사 — 세금, 절세 전략
+▸ 법무팀 (/consult legal)
+  - 법률 자문, 세무사
   ✓ 완료됨
 
-▸ 기획팀 (/product)  ← 지금 여기
-  - 프로덕트 매니저 — 요구사항, 사용자스토리, 로드맵
-  - UX 리서처 — 페르소나, 사용자여정, 인터뷰 설계
+▸ 기획팀 (/consult product)  ← 지금 여기
+  - 프로덕트 매니저, UX 리서처
   ⚡ 진행 중: PRD 작성
 
-▸ 디자인팀 (/design)
-  - UX 디자이너 — 와이어프레임, 플로우, 인터랙션
-  - UI 디자이너 — 비주얼, 디자인시스템, 컴포넌트
-  - 브랜드 디자이너 — 네이밍, 로고, 아이덴티티
+▸ 디자인팀 (/consult design)
+  - UX/UI/브랜드 디자이너
 
 ▸ 개발팀 (/dev)
-  - 백엔드 개발자 — API, 비즈니스로직, DB (TDD 기반)
-  - 프론트엔드 개발자 — UI 구현, 상태관리
+  - 백엔드/프론트엔드 개발자, 코드 리뷰어
   ⚡ 진행 중: 매칭 알고리즘 (status: green)
 
 ▸ QA팀 (/qa)
-  - QA 엔지니어 — 테스트 전략, 자동화 테스트, 커버리지 구축
+  - QA 엔지니어 — 테스트 전략, 커버리지 구축
 
-▸ DevOps (/devops)
-  - DevOps 엔지니어 — CI/CD, 인프라, 배포
-
-▸ 보안 (/security)
-  - 보안 엔지니어 — OWASP, 취약점 분석, 보안감사
-
-▸ 마케팅팀 (/marketing)
-  - 그로스 마케터 — 채널전략, SEO, 퍼널 설계
-  - 카피라이터 — 랜딩카피, 앱스토어 설명
-  - 콘텐츠 마케터 — 블로그, 소셜미디어
-
-▸ 운영팀 (/ops)
-  - 데이터 분석가 — 지표 설계, 대시보드
-  - CS 설계자 — FAQ, 고객응대 플로우
-
-▸ 인프라 (/infra)
-  - 인프라 운영자 — 환경별 DB/서버 접속, 진단, 관리
+▸ DevOps (/consult devops) — CI/CD, 인프라, 배포, 모니터링
+▸ 보안 (/consult security) — OWASP, 취약점 분석, 보안감사
+▸ 마케팅팀 (/consult marketing) — 채널전략, SEO, 카피, 퍼널
+▸ 운영팀 (/consult ops) — 지표 설계, 대시보드, CS FAQ
+▸ 인프라 (/consult infra) — 서버 진단, DB 관리, 성능 튜닝
 
 ▸ 공통
-  - 영향 분석가 — 변경 전 크로스 영향/사이드이펙트 분석
-  - 머지 해결사 — git conflict 자동 해결
+  - 영향 분석가 (impact-analyzer) — 변경 전 크로스 영향 분석
 
 ───
-💡 지금 추천: /product — PRD 작성을 이어서 진행
+💡 지금 추천: /consult product — PRD 작성을 이어서 진행
+💡 부서 작업 맡기기: /consult {부서} "작업 내용"
 ```
 
 ### 3. 부서 상세 ($ARGUMENTS에 부서명이 있을 때)
@@ -114,12 +96,12 @@ DB 원칙: 3NF 정규화 기본, Flyway 마이그레이션 필수
 
 | phase | 추천 |
 |-------|------|
-| initialized | /strategy (시장조사부터) |
-| strategy | /product (기획으로) |
-| product | /design 또는 /dev (디자인 필요 여부에 따라) |
+| initialized | /consult strategy (시장조사부터) |
+| strategy | /consult product (기획으로) |
+| product | /consult design 또는 /dev (디자인 필요 여부에 따라) |
 | design | /dev (개발 시작) |
-| dev | /qa (테스트) 또는 /marketing (출시 준비) |
-| launched | /ops (운영) 또는 /dev (다음 기능) |
+| dev | /qa (테스트) 또는 /consult marketing (출시 준비) |
+| launched | /consult ops (운영) 또는 /dev (다음 기능) |
 
 activeWork가 있으면 해당 작업 이어서 하기를 우선 추천.
 
