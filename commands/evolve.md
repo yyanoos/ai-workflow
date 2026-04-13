@@ -34,7 +34,24 @@
 /evolve --focus "회원 서비스 리팩토링","보안 점검" --until "TODO 0개"
 ```
 
-### 2. 초기화
+### 2. 초기화 (또는 상태 복원)
+
+> **ScheduleWakeup 후에는 대화 컨텍스트가 완전히 사라진다.** 깨어날 때마다 새 세션이므로, 모든 상태는 파일에서 복원해야 한다.
+
+#### 2-A. 기존 세션 복원 (continuousMode 감지)
+
+`.ai-company/evolve/sessions/` 스캔 → `config.json`에 `continuousMode: true` + `status: "running"` 또는 `"paused"` 세션이 존재하는 경우:
+
+1. 해당 config.json 로드
+2. analysis.json 로드 (범위 분석 결과)
+3. tracking.json 로드
+4. `status == "paused"` → 현재 시각이 peakHours 밖인지 확인
+   - 아직 peakHours → ScheduleWakeup(3600s) → 끝
+   - peakHours 끝남 → status → `"running"`
+5. worktree 경로 확인 → 해당 경로에서 다음 태스크 이어서 실행
+6. **초기화/범위 분석 전부 스킵** → 바로 작업 사이클 진입
+
+#### 2-B. 신규 세션 (기존 세션 없음)
 
 1. `~/.claude/evolve-budget.json` 읽기 (글로벌 토큰 예산)
 2. `~/.claude/evolve-global-rules.json` 읽기 (글로벌 학습 룰. 없으면 무시)
@@ -44,28 +61,60 @@
 5. **세션ID 생성**: `{날짜}_{작업내용-slug}` (예: `2026-04-12_test-coverage`). 작업내용을 kebab-case로 변환. 같은 날짜+내용 충돌 시 숫자 접미사(`-2`).
 6. activeSessions에 현재 세션 등록 (세션ID 포함)
 7. 할당량 계산 (다른 활성 세션과 공정 분배)
-8. `.ai-company/evolve/sessions/{세션ID}/config.json` 생성 (방향, 종료조건)
+8. `.ai-company/evolve/sessions/{세션ID}/config.json` 생성 (방향, 종료조건, `continuousMode: true`)
 9. `.ai-company/evolve/sessions/{세션ID}/tracking.json` 생성 (브랜치/PR/머지 상태 추적)
 10. **Worktree 생성**: `git worktree add ../{프로젝트명}-evolve-{세션ID} -b evolve/{세션ID}`
     - 예: `git worktree add ../ai-workflow-evolve-2026-04-12_test-coverage -b evolve/2026-04-12_test-coverage`
     - 이후 모든 작업은 이 worktree 경로에서 수행
+11. 범위 분석 실행 → 결과를 `.ai-company/evolve/sessions/{세션ID}/analysis.json`에 저장
 
-### 3. 작업 사이클
+### 3. 작업 사이클 (연속 실행)
+
+한 세션에서 태스크 1개를 수행하고, `ScheduleWakeup`으로 다음 세션을 예약한다.
+세션 간 상태는 config.json으로 전달된다.
 
 ```
-반복:
-  1. 개선 대상 탐색 (focus 방향에 따라)
-  2. learnings.json의 거절 패턴에 해당하는 변경은 제외하거나 방식 변경
-  3. 우선순위 정렬 (영향도 × 난이도)
-  4. 하나 개선 → 커밋
-  4. 종료조건 체크 (goal 달성? maxCommits? maxTime?)
-  5. 예산 체크:
-     - ~/.claude/evolve-budget.json 다시 읽기
-     - activeSessions 변동 → 할당량 재계산
-     - 할당량 초과 → 대기 (waitingUntil 기록)
-     - 회복 → 이어서 진행
-  6. 종료조건 미달 + 예산 남음 → 다음 항목으로
+태스크 수행:
+  1. config.json에서 tasksRemaining의 첫 번째 태스크 꺼냄
+  2. analysis.json에서 해당 태스크의 컨텍스트 로드
+  3. learnings.json의 거절 패턴에 해당하면 방식 변경 또는 스킵
+  4. 태스크 수행 → 커밋
+     - 성공 → tasksCompleted에 추가, consecutiveFailures = 0
+     - 실패 → 에러 핸들링 (아래 참조)
+  5. config.json 업데이트 (cycle 필드)
+  6. tracking.json에 사이클 기록 추가
+
+종료 판정:
+  영구 종료 조건 충족? → 전문가 리뷰 → PR + 리포트 → 끝
+  일시중지 조건 충족? → ScheduleWakeup(재개 시점 delay) → 끝
+  둘 다 아님? → ScheduleWakeup(config.wakeupDelay || 270s) → 끝
 ```
+
+#### 에러 핸들링 (무한루프 방지)
+
+```
+태스크 실패 시:
+  1. consecutiveFailures++
+  2. 해당 태스크의 attempts++
+  3. 에러 내용을 tracking.json에 기록
+
+분기:
+  - 같은 태스크 3회 실패 → failedTasks에 추가 (skipped: true) → 다음 태스크로
+  - 전체 연속 5회 실패 → 루프 중단 → 완료된 분량으로 부분 PR 생성
+  - 태스크 성공 → consecutiveFailures = 0 (리셋)
+```
+
+#### ScheduleWakeup 호출 규격
+
+```
+ScheduleWakeup({
+  delaySeconds: config.wakeupDelay || 270,
+  reason: "evolve {sessionId} 사이클 {N}/{total}, 다음: {taskName}",
+  prompt: "/evolve"
+})
+```
+
+> **왜 270s인가?** 프롬프트 캐시 TTL이 5분(300s). 270s면 캐시 안에서 깨어나므로 비용/속도 효율적. 300s 이상은 캐시 미스. wakeupDelay는 config.json에서 변경 가능.
 
 ### 4. 전문가 리뷰 (PR 제출 전 필수)
 
@@ -81,13 +130,54 @@
 4. **재리뷰**: major 수정 시 해당 리뷰어 재실행 (최대 3회 피드백 루프)
    - 3회 후에도 major 잔존 → 해당 변경을 revert하고 나머지만 PR에 포함
 
-### 5. 종료
+### 5. 종료 판정
+
+매 사이클 끝에 실행. 결과에 따라 루프를 계속하거나 멈춘다.
+
+#### 영구 종료 (ScheduleWakeup 호출 안 함 → PR + 리포트)
+
+| 조건 | 판정 방식 |
+|------|----------|
+| `maxCommits` 도달 | `cycle.current >= stopConditions.global.maxCommits` |
+| `maxTime` 초과 | `now - startedAt >= maxTime` |
+| `tasksRemaining` 빈 배열 | 모든 태스크 완료 |
+| 예산 소진 (일일/주간) | `evolve-budget.json` 확인 |
+| 연속 실패 임계치 초과 | `cycle.consecutiveFailures >= 5` → 부분 PR 생성 |
+| goal 달성 | 아래 "goal 판정" 참조 |
+
+**goal 판정 방식:**
+- **측정 가능** ("커버리지 80%", "TODO 0개"): 커맨드 실행으로 수치 확인. 매 사이클 판정.
+- **정성적** ("코드 품질 개선"): 전체 태스크의 70% 완료 후 1회만 판정. 미달성이면 나머지 계속.
+
+#### 일시중지 (ScheduleWakeup으로 재개 예약)
+
+| 조건 | 동작 |
+|------|------|
+| peakHours 진입 | config.json status → `"paused"`, ScheduleWakeup(peakHours 종료까지, 최대 3600s) |
+| 시간 한도 부족 (hourly) | ScheduleWakeup(다음 시간까지 남은 초, 최대 3600s) |
+
+**peakHours 재개 흐름:**
+```
+peakHours 진입 감지:
+  1. config.json status → "paused"
+  2. peakHours 종료 시점까지 남은 초 계산
+  3. 남은 초 ≤ 3600 → ScheduleWakeup(남은 초)
+  4. 남은 초 > 3600 → ScheduleWakeup(3600) → 깨어나서 재확인
+
+깨어났을 때 (2-A에서 처리):
+  1. config.json 로드 → status == "paused"
+  2. 현재 시각이 peakHours 밖? → status → "running", 태스크 실행
+  3. 아직 peakHours? → 다시 ScheduleWakeup
+```
+
+#### 영구 종료 시 실행
 
 1. 모든 변경사항으로 `.ai-company/evolve/sessions/{세션ID}/report.html` 생성
 2. PR 생성 (`evolve/{세션ID}` → main). PR 제목에 세션ID 포함.
-3. `tracking.json` 업데이트 (status → `pr_created`, prNumber, prUrl 기록)
+3. config.json status → `"done"`, tracking.json 업데이트 (status → `pr_created`, prNumber, prUrl 기록)
 4. `~/.claude/evolve-budget.json`에서 해당 세션을 activeSessions에서 제거
-5. 사용자에게 안내
+5. Worktree 정리: `git worktree remove ../{프로젝트명}-evolve-{세션ID}`
+6. **ScheduleWakeup 호출 안 함** → 루프 종료
 
 ---
 
@@ -247,6 +337,23 @@ totalAvailable = min(
   "direction": "인증 쪽 edge case 위주",
   "priorities": ["인증 관련 우선", "happy path보다 edge case"],
   "exclude": ["telegram-bot"],
+  "continuousMode": true,
+  "wakeupDelay": 270,
+  "status": "running",
+  "worktreePath": "../ai-workflow-evolve-2026-04-12_auth-edge-case",
+  "cycle": {
+    "current": 3,
+    "tasksCompleted": ["task-1", "task-2", "task-3"],
+    "tasksRemaining": ["task-4", "task-5"],
+    "failedTasks": [],
+    "revertedCommits": [],
+    "consecutiveFailures": 0,
+    "focusProgress": {
+      "test": { "completed": 2, "total": 3, "goalMet": false },
+      "security": { "completed": 1, "total": 2, "goalMet": false }
+    },
+    "lastWakeup": "2026-04-12T23:30:00+09:00"
+  },
   "stopConditions": {
     "global": { "maxCommits": 10, "maxTime": "4h" },
     "perFocus": {
@@ -254,6 +361,36 @@ totalAvailable = min(
       "security": { "goal": "OWASP 통과" }
     }
   }
+}
+```
+
+**config.json status 값:**
+| status | 의미 |
+|--------|------|
+| `running` | 작업 진행 중 (다음 ScheduleWakeup 예약됨) |
+| `paused` | peakHours 또는 예산 대기 중 |
+| `completing` | 전문가 리뷰 + PR 생성 중 |
+| `done` | PR 생성 완료 |
+| `failed` | 연속 실패로 중단 (부분 PR 생성됨) |
+
+### .ai-company/evolve/sessions/{세션ID}/analysis.json (범위 분석 결과)
+
+신규 세션의 범위 분석(초기화 2-B 단계) 결과를 저장. 이후 매 사이클에서 태스크 컨텍스트를 복원할 때 참조한다.
+
+```json
+{
+  "departments": ["Dev", "QA"],
+  "tasks": [
+    {
+      "id": "task-1",
+      "description": "MemberService 인증 edge case 테스트 추가",
+      "department": "Dev",
+      "priority": "high",
+      "context": "현재 happy path만 테스트됨, 만료 토큰/잘못된 형식 미커버"
+    }
+  ],
+  "flaggedItems": [],
+  "generatedAt": "2026-04-12T23:20:00+09:00"
 }
 ```
 
@@ -350,16 +487,16 @@ totalAvailable = min(
   활성 세션:
     [1] 2026-04-12_auth-edge-case (evolve/2026-04-12_auth-edge-case)
         방향: test, security (테스트에 집중)
-        상태: working
-        진행: 3/10 커밋
+        상태: running (사이클 3/10, 다음 wakeup 270s 후)
+        진행: 3/10 커밋 (실패 0, 스킵 0)
         다음: MemberService 인증 edge case 테스트
     [2] 2026-04-12_query-optimization (evolve/2026-04-12_query-optimization)
         방향: performance
-        상태: pr_created (#51)
-        진행: 5/5 커밋 (완료)
+        상태: paused (peakHours 대기, 17:00 재개 예정)
+        진행: 3/5 커밋
   완료 세션:
-    [3] 2026-04-11_dead-code-cleanup → merged (#48)
-    [4] 2026-04-10_input-validation → rejected (#45, 회고 완료)
+    [3] 2026-04-11_dead-code-cleanup → done, PR #48 (merged)
+    [4] 2026-04-10_input-validation → failed, PR #45 (부분 PR, 연속 실패)
   총 토큰: 45,000 / 150,000 사용
 ```
 
@@ -497,6 +634,7 @@ evolve 실행 시 `learnings.json`을 읽고:
 | 브랜치 | `evolve/{세션ID}` | 세션별 독립 브랜치 |
 | config | `.ai-company/evolve/sessions/{세션ID}/config.json` | 세션별 독립 파일 |
 | tracking | `.ai-company/evolve/sessions/{세션ID}/tracking.json` | 세션별 독립 파일 |
+| analysis | `.ai-company/evolve/sessions/{세션ID}/analysis.json` | 세션별 독립 파일 |
 | 리포트 | `.ai-company/evolve/sessions/{세션ID}/report.html` | 세션별 독립 파일 |
 | PR | `evolve/{세션ID}` → main | 세션별 독립 PR |
 
